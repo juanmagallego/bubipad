@@ -36,6 +36,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow-x: hidden;
   background: var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
@@ -361,6 +362,9 @@ button.wide {
 #editor {
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  padding-right: 6px;
 }
 
 #empty-state {
@@ -412,8 +416,12 @@ button.wide {
   display: none;
   flex: 1;
   min-height: 0;
+  min-width: 0;
   width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   background: var(--bg);
   color: var(--text-fg);
   font-family: "Courier Prime", Consolas, "Courier New", monospace;
@@ -455,6 +463,23 @@ button.wide {
   border-radius: 3px;
   padding: 0 4px;
   font-size: 0.9em;
+}
+
+#preview-view pre {
+  max-width: 100%;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+#preview-view pre code {
+  border: none;
+  padding: 0;
+}
+
+#preview-view img,
+#preview-view table {
+  max-width: 100%;
 }
 
 #preview-view a {
