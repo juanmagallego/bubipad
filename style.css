@@ -216,6 +216,7 @@ button.wide {
   flex: 1;
   display: flex;
   min-height: 0;
+  position: relative;
 }
 
 #sidebar {
@@ -228,6 +229,18 @@ button.wide {
 
 #sidebar.hidden {
   display: none;
+}
+
+/* Shown temporarily by hovering the left edge of the screen: floats over
+   the editor instead of pushing it, so Monaco never has to relayout. */
+#sidebar.peek {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  z-index: 40;
+  box-shadow: 2px 0 14px rgba(0, 0, 0, 0.4);
 }
 
 #main-panel {
