@@ -1,4 +1,4 @@
-const CACHE_NAME = "bubipad-shell-v1";
+const CACHE_NAME = "bubipad-shell-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,6 +17,11 @@ const APP_SHELL = [
   "./icons/icon128.png",
   "./icons/icon192.png",
   "./icons/icon512.png",
+  "./dic/index.json",
+  "./dic/es_ES.aff",
+  "./dic/es_ES.dic",
+  "./dic/en_US.aff",
+  "./dic/en_US.dic",
 ];
 
 self.addEventListener("install", (event) => {
