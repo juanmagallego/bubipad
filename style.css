@@ -105,6 +105,8 @@ button.wide {
 #edit-btn.active,
 #preview-btn.active,
 #lang-btn.active,
+#lang-es-btn.active,
+#lang-eu-btn.active,
 #theme-btn.active,
 #sidebar-toggle-btn.active {
   background: var(--accent);
