@@ -22,8 +22,6 @@ const APP_SHELL = [
   "./dic/es_ES.dic",
   "./dic/eu_ES.aff",
   "./dic/eu_ES.dic",
-  "./dic/en_US.aff",
-  "./dic/en_US.dic",
 ];
 
 self.addEventListener("install", (event) => {
