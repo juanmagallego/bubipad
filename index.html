@@ -96,7 +96,13 @@
         </button>
       </div>
       <div class="group right">
-        <button id="lang-btn" title="Corrector ortográfico (Hunspell) — elegir idioma">
+        <button id="lang-es-btn" title="Corrector ortográfico: Español">
+          <span class="font-btn-label">ES</span>
+        </button>
+        <button id="lang-eu-btn" title="Corrector ortográfico: Euskara">
+          <span class="font-btn-label">EU</span>
+        </button>
+        <button id="lang-btn" title="Cargar diccionario desde una carpeta del disco (opcional)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="8" cy="8" r="6.2"/>
             <path d="M1.8 8 h12.4 M8 1.8 a9 9 0 0 1 0 12.4 M8 1.8 a9 9 0 0 0 0 12.4"/>
@@ -164,7 +170,6 @@
     <div id="lang-status-text">Corrector: desactivado</div>
     <select id="lang-select"><option value="">Ninguno</option></select>
     <button id="lang-pick-folder-btn" class="wide">Elegir carpeta de diccionarios…</button>
-    <p class="lang-hint">La app incluye diccionarios listos para usar (grupo "Incluidos en la app"), que funcionan en cualquier dispositivo, iOS incluido, sin pedir permisos. En navegadores de escritorio compatibles (Chrome, Edge…) puedes además elegir una carpeta local con pares de archivos <code>idioma.aff</code> + <code>idioma.dic</code> (los mismos que usan LibreOffice/Firefox) para añadir tus propios diccionarios; la extensión recuerda la última carpeta usada y la vuelve a abrir automáticamente (solo tendrás que confirmar el acceso con un clic si el navegador lo pide de nuevo).</p>
   </div>
 
   <script src="storage-shim.js"></script>
