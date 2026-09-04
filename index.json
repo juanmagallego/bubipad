@@ -1,4 +1,5 @@
 [
   { "id": "es_ES", "label": "Español (España)" },
+  { "id": "eu_ES", "label": "Euskara" },
   { "id": "en_US", "label": "English (US)" }
 ]

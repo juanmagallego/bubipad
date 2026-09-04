@@ -20,6 +20,8 @@ const APP_SHELL = [
   "./dic/index.json",
   "./dic/es_ES.aff",
   "./dic/es_ES.dic",
+  "./dic/eu_ES.aff",
+  "./dic/eu_ES.dic",
   "./dic/en_US.aff",
   "./dic/en_US.dic",
 ];
