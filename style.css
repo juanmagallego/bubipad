@@ -15,6 +15,13 @@
   --accent: #007acc;
   --accent-hover: #1177bb;
   --link-color: #ffd700;
+  --mdh-heading: #4fc1ff;
+  --mdh-code: #ce9178;
+  --mdh-code-bg: rgba(255, 255, 255, 0.08);
+  --mdh-quote: #6a9955;
+  --mdh-list-marker: #d7ba7d;
+  --mdh-strike: #808080;
+  --mdh-hr: #808080;
 }
 
 html[data-theme="light"] {
@@ -30,6 +37,13 @@ html[data-theme="light"] {
   --accent: #007acc;
   --accent-hover: #1177bb;
   --link-color: #0047ab;
+  --mdh-heading: #0057b7;
+  --mdh-code: #a31515;
+  --mdh-code-bg: rgba(0, 0, 0, 0.06);
+  --mdh-quote: #2e7d32;
+  --mdh-list-marker: #8a6d00;
+  --mdh-strike: #757575;
+  --mdh-hr: #9e9e9e;
 }
 
 html, body {
@@ -412,28 +426,105 @@ button.wide {
   font-display: swap;
 }
 
-#text-view {
+#text-view-wrap {
   display: none;
   flex: 1;
   min-height: 0;
   min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+#text-view-highlight,
+#text-view {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  resize: none;
+  margin: 0;
   border: none;
-  outline: none;
-  overflow-y: auto;
-  overflow-wrap: break-word;
-  background: var(--bg);
-  color: var(--text-fg);
   font-family: "Courier Prime", Consolas, "Courier New", monospace;
   font-size: 16px;
   line-height: 1.6;
   padding: 12px 20px;
   box-sizing: border-box;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+#text-view-highlight {
+  z-index: 1;
+  overflow: hidden;
+  color: var(--text-fg);
+  background: var(--bg);
+  pointer-events: none;
+}
+
+#text-view {
+  z-index: 2;
+  resize: none;
+  outline: none;
+  overflow-y: auto;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text-fg);
   -webkit-user-select: text;
   user-select: text;
   touch-action: manipulation;
+}
+
+#text-view-highlight .mdh-marker {
+  opacity: 0.55;
+}
+
+#text-view-highlight .mdh-heading {
+  color: var(--mdh-heading);
+  font-weight: 700;
+}
+
+#text-view-highlight .mdh-bold {
+  font-weight: 700;
+}
+
+#text-view-highlight .mdh-italic {
+  font-style: italic;
+}
+
+#text-view-highlight .mdh-strike {
+  color: var(--mdh-strike);
+  text-decoration: line-through;
+}
+
+#text-view-highlight .mdh-code,
+#text-view-highlight .mdh-code-block {
+  color: var(--mdh-code);
+  background: var(--mdh-code-bg);
+  border-radius: 3px;
+}
+
+#text-view-highlight .mdh-quote {
+  color: var(--mdh-quote);
+  font-style: italic;
+}
+
+#text-view-highlight .mdh-list-marker {
+  color: var(--mdh-list-marker);
+  font-weight: 700;
+}
+
+#text-view-highlight .mdh-link {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+#text-view-highlight .mdh-link-url {
+  color: var(--link-color);
+  opacity: 0.65;
+}
+
+#text-view-highlight .mdh-hr {
+  color: var(--mdh-hr);
+  opacity: 0.7;
 }
 
 #preview-view {

@@ -152,7 +152,10 @@
           <p class="empty-hint">Crea uno nuevo (Ctrl+Shift+A) o abre uno del ordenador (Ctrl+O)</p>
         </div>
         <div id="editor"></div>
-        <textarea id="text-view" spellcheck="true" autocapitalize="sentences" autocomplete="off" autocorrect="on"></textarea>
+        <div id="text-view-wrap">
+          <div id="text-view-highlight" aria-hidden="true"></div>
+          <textarea id="text-view" spellcheck="true" autocapitalize="sentences" autocomplete="off" autocorrect="on"></textarea>
+        </div>
         <div id="preview-view"></div>
       </div>
     </div>
