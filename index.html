@@ -108,7 +108,12 @@
             <path d="M1.8 8 h12.4 M8 1.8 a9 9 0 0 1 0 12.4 M8 1.8 a9 9 0 0 0 0 12.4"/>
           </svg>
         </button>
-        <button id="edit-btn" class="active" title="Editor (Ctrl+Shift+E alterna con Vista previa)">
+        <button id="text-btn" class="active" title="Modo texto plano, edición sencilla y con selección táctil nativa (Ctrl+Shift+E)">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 4 h11 M2.5 8 h11 M2.5 12 h7"/>
+          </svg>
+        </button>
+        <button id="edit-btn" title="Editor con resaltado de sintaxis (Ctrl+Shift+E alterna con Vista previa)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M5.5 5 L2.5 8 L5.5 11"/>
             <path d="M10.5 5 L13.5 8 L10.5 11"/>
@@ -147,6 +152,7 @@
           <p class="empty-hint">Crea uno nuevo (Ctrl+Shift+A) o abre uno del ordenador (Ctrl+O)</p>
         </div>
         <div id="editor"></div>
+        <textarea id="text-view" spellcheck="true" autocapitalize="sentences" autocomplete="off" autocorrect="on"></textarea>
         <div id="preview-view"></div>
       </div>
     </div>

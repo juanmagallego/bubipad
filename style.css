@@ -412,6 +412,30 @@ button.wide {
   font-display: swap;
 }
 
+#text-view {
+  display: none;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  background: var(--bg);
+  color: var(--text-fg);
+  font-family: "Courier Prime", Consolas, "Courier New", monospace;
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  -webkit-user-select: text;
+  user-select: text;
+  touch-action: manipulation;
+}
+
 #preview-view {
   display: none;
   flex: 1;
