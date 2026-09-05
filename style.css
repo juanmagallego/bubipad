@@ -450,6 +450,7 @@ button.wide {
   box-sizing: border-box;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+  scrollbar-gutter: stable;
 }
 
 #text-view-highlight {
