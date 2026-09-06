@@ -78,6 +78,20 @@ html, body {
   .group.right {
     margin-left: 6px;
   }
+
+  button {
+    width: 34px;
+    height: 34px;
+  }
+
+  button svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .font-btn-label {
+    font-size: 12px;
+  }
 }
 
 .group {
