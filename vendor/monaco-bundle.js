@@ -1214,6 +1214,76 @@ async function bpGhRefreshPopup() {
   }
 }
 
+let bpOutlineBtn = document.getElementById("outline-btn");
+let bpOutlinePopup = document.getElementById("outline-popup");
+let bpOutlineList = document.getElementById("outline-list");
+
+function bpBuildOutline() {
+  let model = Nt && Nt.getModel();
+  if (!model) return [];
+  let text = model.getValue();
+  let items = [];
+  let lines = text.split("\n");
+  let inFence = false;
+  for (let i = 0; i < lines.length; i++) {
+    let raw = lines[i];
+    if (/^\s*(`{3,}|~{3,})/.test(raw)) { inFence = !inFence; continue; }
+    if (inFence) continue;
+    let m = raw.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+    if (m) items.push({ level: m[1].length, text: m[2], line: i + 1 });
+  }
+  return items;
+}
+
+function bpRenderOutline() {
+  bpOutlineList.innerHTML = "";
+  let items = bpBuildOutline();
+  if (!items.length) {
+    let empty = document.createElement("div");
+    empty.className = "outline-empty";
+    empty.textContent = Nt && Nt.getModel() ? "Este documento no tiene títulos." : "Ningún archivo abierto.";
+    bpOutlineList.appendChild(empty);
+    return;
+  }
+  for (let item of items) {
+    let el = document.createElement("div");
+    el.className = "outline-item";
+    el.style.paddingLeft = `${6 + (item.level - 1) * 14}px`;
+    el.textContent = item.text;
+    el.dataset.line = item.line;
+    bpOutlineList.appendChild(el);
+  }
+}
+
+function bpToggleOutlinePopup() {
+  if (bpOutlinePopup.style.display === "block") { bpOutlinePopup.style.display = "none"; return; }
+  let rect = bpOutlineBtn.getBoundingClientRect();
+  bpOutlinePopup.style.top = `${rect.bottom + 4}px`;
+  bpOutlinePopup.style.left = `${Math.min(rect.left, window.innerWidth - 276)}px`;
+  bpRenderOutline();
+  bpOutlinePopup.style.display = "block";
+}
+
+bpOutlineBtn.addEventListener("click", bpToggleOutlinePopup);
+document.addEventListener("click", o => {
+  if (bpOutlinePopup.style.display === "block" && !bpOutlinePopup.contains(o.target) && !bpOutlineBtn.contains(o.target)) {
+    bpOutlinePopup.style.display = "none";
+  }
+});
+bpOutlineList.addEventListener("click", o => {
+  let item = o.target.closest(".outline-item");
+  if (!item) return;
+  let line = parseInt(item.dataset.line, 10);
+  bpOutlinePopup.style.display = "none";
+  if (lp !== "edit") nB("edit");
+  requestAnimationFrame(() => {
+    Nt.layout();
+    Nt.revealLineInCenter(line);
+    Nt.setPosition({ lineNumber: line, column: 1 });
+    Nt.focus();
+  });
+});
+
 function bpGhTogglePopup() {
   if (bpGhPopup.style.display === "block") { bpGhPopup.style.display = "none"; return; }
   let rect = bpGhBtn.getBoundingClientRect();
