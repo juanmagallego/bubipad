@@ -76,6 +76,13 @@
         <button id="font-inc-btn" title="Aumentar tamaño de letra (Ctrl+Shift+G)">
           <span class="font-btn-label">A⁺</span>
         </button>
+        <button id="outline-btn" title="Esquema de títulos del documento">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 3.5 h11"/>
+            <path d="M4.5 7.5 h9"/>
+            <path d="M6.5 11.5 h7"/>
+          </svg>
+        </button>
         <button id="search-btn" title="Buscar en el documento (Ctrl+F)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="7" cy="7" r="4.8"/>
@@ -152,6 +159,11 @@
     <input id="github-repo-input" type="text" class="gh-input" placeholder="usuario/repositorio" autocomplete="off" />
     <button id="github-connect-btn" class="wide">Conectar y abrir</button>
     <button id="github-forget-btn" class="wide">Olvidar credenciales</button>
+  </div>
+
+  <div id="outline-popup">
+    <div id="outline-status-text">Esquema del documento</div>
+    <div id="outline-list"></div>
   </div>
 
   <div id="lang-popup">
