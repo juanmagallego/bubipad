@@ -15,13 +15,6 @@
   --accent: #007acc;
   --accent-hover: #1177bb;
   --link-color: #ffd700;
-  --mdh-heading: #4fc1ff;
-  --mdh-code: #ce9178;
-  --mdh-code-bg: rgba(255, 255, 255, 0.08);
-  --mdh-quote: #6a9955;
-  --mdh-list-marker: #d7ba7d;
-  --mdh-strike: #808080;
-  --mdh-hr: #808080;
 }
 
 html[data-theme="light"] {
@@ -37,13 +30,6 @@ html[data-theme="light"] {
   --accent: #007acc;
   --accent-hover: #1177bb;
   --link-color: #0047ab;
-  --mdh-heading: #0057b7;
-  --mdh-code: #a31515;
-  --mdh-code-bg: rgba(0, 0, 0, 0.06);
-  --mdh-quote: #2e7d32;
-  --mdh-list-marker: #8a6d00;
-  --mdh-strike: #757575;
-  --mdh-hr: #9e9e9e;
 }
 
 html, body {
@@ -426,30 +412,20 @@ button.wide {
   font-display: swap;
 }
 
-#text-view-wrap {
-  display: none;
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-}
-
 #text-view {
-  display: block;
+  display: none;
   flex: 1;
   min-height: 0;
   min-width: 0;
   width: 100%;
   height: 100%;
-  margin: 0;
+  resize: none;
   border: none;
   outline: none;
   overflow-y: auto;
   overflow-wrap: break-word;
-  white-space: pre-wrap;
   background: var(--bg);
   color: var(--text-fg);
-  caret-color: var(--text-fg);
   font-family: "Courier Prime", Consolas, "Courier New", monospace;
   font-size: 16px;
   line-height: 1.6;
@@ -458,60 +434,6 @@ button.wide {
   -webkit-user-select: text;
   user-select: text;
   touch-action: manipulation;
-}
-
-#text-view .mdh-marker {
-  opacity: 0.55;
-}
-
-#text-view .mdh-heading {
-  color: var(--mdh-heading);
-  font-weight: 700;
-}
-
-#text-view .mdh-bold {
-  font-weight: 700;
-}
-
-#text-view .mdh-italic {
-  font-style: italic;
-}
-
-#text-view .mdh-strike {
-  color: var(--mdh-strike);
-  text-decoration: line-through;
-}
-
-#text-view .mdh-code,
-#text-view .mdh-code-block {
-  color: var(--mdh-code);
-  background: var(--mdh-code-bg);
-  border-radius: 3px;
-}
-
-#text-view .mdh-quote {
-  color: var(--mdh-quote);
-  font-style: italic;
-}
-
-#text-view .mdh-list-marker {
-  color: var(--mdh-list-marker);
-  font-weight: 700;
-}
-
-#text-view .mdh-link {
-  color: var(--link-color);
-  text-decoration: underline;
-}
-
-#text-view .mdh-link-url {
-  color: var(--link-color);
-  opacity: 0.65;
-}
-
-#text-view .mdh-hr {
-  color: var(--mdh-hr);
-  opacity: 0.7;
 }
 
 #preview-view {
