@@ -1,3 +1,8 @@
+# Aplicación
+
+[https://juanmagallego.github.io/bubipad/](https://juanmagallego.github.io/bubipad/)
+
+
 # Diccionarios incluidos en la app
 
 BubiPad busca aquí, en `dic/index.json`, la lista de diccionarios Hunspell
