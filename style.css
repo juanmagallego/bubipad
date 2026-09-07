@@ -80,17 +80,17 @@ html, body {
   }
 
   button {
-    width: 44px;
-    height: 44px;
+    width: 56px;
+    height: 56px;
   }
 
   button svg {
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
   }
 
   .font-btn-label {
-    font-size: 14px;
+    font-size: 18px;
   }
 }
 
