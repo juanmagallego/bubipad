@@ -57,42 +57,6 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
-@media (max-width: 640px) {
-  #toolbar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  #toolbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .group,
-  .group button {
-    flex-shrink: 0;
-  }
-
-  .group.right {
-    margin-left: 6px;
-  }
-
-  button {
-    width: 56px;
-    height: 56px;
-  }
-
-  button svg {
-    width: 32px;
-    height: 32px;
-  }
-
-  .font-btn-label {
-    font-size: 18px;
-  }
-}
 
 .group {
   display: flex;
@@ -881,4 +845,41 @@ button.wide {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  #toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  #toolbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .group,
+  .group button {
+    flex-shrink: 0;
+  }
+
+  .group.right {
+    margin-left: 6px;
+  }
+
+  button {
+    width: 56px;
+    height: 56px;
+  }
+
+  button svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .font-btn-label {
+    font-size: 18px;
+  }
 }
