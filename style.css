@@ -870,16 +870,16 @@ button.wide {
   }
 
   button {
-    width: 56px;
-    height: 56px;
+    width: 40px;
+    height: 40px;
   }
 
   button svg {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
   }
 
   .font-btn-label {
-    font-size: 18px;
+    font-size: 13px;
   }
 }
