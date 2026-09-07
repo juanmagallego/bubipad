@@ -80,17 +80,17 @@ html, body {
   }
 
   button {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
   }
 
   button svg {
-    width: 23px;
-    height: 23px;
+    width: 25px;
+    height: 25px;
   }
 
   .font-btn-label {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
@@ -335,7 +335,6 @@ button.wide {
   font-weight: 600;
   letter-spacing: 0.04em;
   color: var(--btn-fg);
-  cursor: pointer;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
