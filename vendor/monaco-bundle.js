@@ -1215,6 +1215,126 @@ async function bpGhRefreshPopup() {
   }
 }
 
+let bpFileSearchBtn = document.getElementById("file-search-btn");
+let bpFileSearchPopup = document.getElementById("file-search-popup");
+let bpFileSearchInput = document.getElementById("file-search-input");
+let bpFileSearchResults = document.getElementById("file-search-results");
+let bpFileSearchIndexCache = null;
+let bpFileSearchActiveIndex = -1;
+
+async function bpFileIndexWalk(node, path, results) {
+  if (node.kind === "file") { results.push({ node, path }); return; }
+  if (node.children === null) { try { await Zb(node); } catch (e) {} }
+  await Promise.all((node.children || []).map(child =>
+    bpFileIndexWalk(child, path ? path + "/" + child.name : child.name, results)
+  ));
+}
+
+async function bpBuildFileIndex() {
+  let results = [];
+  if (wr) await bpFileIndexWalk(wr, "", results);
+  results.sort((a, b) => a.path.localeCompare(b.path, "es", { sensitivity: "base" }));
+  return results;
+}
+
+function bpFilterFileIndex(query) {
+  if (!bpFileSearchIndexCache) return [];
+  let q = query.trim().toLowerCase();
+  if (!q) return bpFileSearchIndexCache.slice(0, 200);
+  let scored = [];
+  for (let item of bpFileSearchIndexCache) {
+    let nameLower = item.node.name.toLowerCase();
+    let pathLower = item.path.toLowerCase();
+    let idx = pathLower.indexOf(q);
+    if (idx === -1) continue;
+    let score = nameLower.startsWith(q) ? 0 : nameLower.includes(q) ? 1 : 2;
+    scored.push({ item, score, idx });
+  }
+  scored.sort((a, b) => a.score - b.score || a.idx - b.idx || a.item.path.length - b.item.path.length);
+  return scored.slice(0, 200).map(s => s.item);
+}
+
+function bpRenderFileSearchResults() {
+  let items = bpFilterFileIndex(bpFileSearchInput.value);
+  bpFileSearchActiveIndex = items.length ? 0 : -1;
+  bpFileSearchResults.innerHTML = "";
+  if (!wr) {
+    let empty = document.createElement("div");
+    empty.className = "outline-empty";
+    empty.textContent = "No hay ninguna carpeta ni repositorio abierto.";
+    bpFileSearchResults.appendChild(empty);
+    return;
+  }
+  if (!items.length) {
+    let empty = document.createElement("div");
+    empty.className = "outline-empty";
+    empty.textContent = "Sin coincidencias.";
+    bpFileSearchResults.appendChild(empty);
+    return;
+  }
+  items.forEach((res, i) => {
+    let el = document.createElement("div");
+    el.className = "file-search-item" + (i === 0 ? " active" : "");
+    let folderPath = res.path.includes("/") ? res.path.slice(0, res.path.lastIndexOf("/")) : "";
+    el.innerHTML = `<span class="fs-name"></span><span class="fs-path"></span>`;
+    el.querySelector(".fs-name").textContent = res.node.name;
+    el.querySelector(".fs-path").textContent = folderPath;
+    el.addEventListener("click", () => bpOpenFileSearchResult(res));
+    bpFileSearchResults.appendChild(el);
+  });
+}
+
+async function bpOpenFileSearchResult(res) {
+  bpFileSearchPopup.style.display = "none";
+  try {
+    if (res.node.handle && res.node.handle.__gh) await bpGhOpenFile(res.node);
+    else await dq(res.node.handle, Xre(res.node));
+  } catch (e) { xo(`\u26A0 ${e.message}`); }
+}
+
+function bpMoveFileSearchActive(delta) {
+  let rows = bpFileSearchResults.querySelectorAll(".file-search-item");
+  if (!rows.length) return;
+  rows[bpFileSearchActiveIndex]?.classList.remove("active");
+  bpFileSearchActiveIndex = (bpFileSearchActiveIndex + delta + rows.length) % rows.length;
+  let active = rows[bpFileSearchActiveIndex];
+  active.classList.add("active");
+  active.scrollIntoView({ block: "nearest" });
+}
+
+async function bpToggleFileSearchPopup() {
+  if (bpFileSearchPopup.style.display === "block") { bpFileSearchPopup.style.display = "none"; return; }
+  let rect = bpFileSearchBtn.getBoundingClientRect();
+  bpFileSearchPopup.style.top = `${rect.bottom + 4}px`;
+  bpFileSearchPopup.style.left = `${Math.min(rect.left, window.innerWidth - 316)}px`;
+  bpFileSearchInput.value = "";
+  bpFileSearchResults.innerHTML = "";
+  bpFileSearchPopup.style.display = "block";
+  bpFileSearchInput.focus();
+  bpFileSearchIndexCache = wr ? await bpBuildFileIndex() : [];
+  bpRenderFileSearchResults();
+}
+
+bpFileSearchBtn.addEventListener("click", bpToggleFileSearchPopup);
+bpFileSearchInput.addEventListener("input", bpRenderFileSearchResults);
+bpFileSearchInput.addEventListener("keydown", o => {
+  if (o.key === "ArrowDown") { o.preventDefault(); bpMoveFileSearchActive(1); }
+  else if (o.key === "ArrowUp") { o.preventDefault(); bpMoveFileSearchActive(-1); }
+  else if (o.key === "Enter") {
+    o.preventDefault();
+    let items = bpFilterFileIndex(bpFileSearchInput.value);
+    if (items[bpFileSearchActiveIndex]) bpOpenFileSearchResult(items[bpFileSearchActiveIndex]);
+  } else if (o.key === "Escape") {
+    o.preventDefault();
+    bpFileSearchPopup.style.display = "none";
+  }
+});
+document.addEventListener("click", o => {
+  if (bpFileSearchPopup.style.display === "block" && !bpFileSearchPopup.contains(o.target) && !bpFileSearchBtn.contains(o.target)) {
+    bpFileSearchPopup.style.display = "none";
+  }
+});
+
 let bpOutlineBtn = document.getElementById("outline-btn");
 let bpOutlinePopup = document.getElementById("outline-popup");
 let bpOutlineList = document.getElementById("outline-list");
