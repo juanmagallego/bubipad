@@ -683,6 +683,55 @@ button.wide {
   text-decoration-thickness: 1.5px;
 }
 
+#file-search-popup {
+  display: none;
+  position: fixed;
+  z-index: 200;
+  width: 300px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  padding: 10px;
+}
+
+.file-search-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-fg);
+  padding: 5px 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.file-search-item:hover,
+.file-search-item.active {
+  background: var(--btn-bg-hover);
+}
+
+.file-search-item .fs-name {
+  display: block;
+  font-size: 12.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-search-item .fs-path {
+  display: block;
+  font-size: 10.5px;
+  color: var(--btn-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 #outline-popup {
   display: none;
   position: fixed;
