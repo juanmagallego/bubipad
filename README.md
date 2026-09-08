@@ -4,25 +4,25 @@
 
 # ATAJOS
 
-- Alt+K, s   → guardar
-- Alt+K, a   → guardar como
-- Alt+K, n   → nueva nota
-- Alt+K, o   → abrir carpeta
-- Alt+K, f   → abrir archivo del ordenador
-- Alt+K, g   → conectar/abrir panel de GitHub
-- Alt+K, p   → buscar y abrir archivo por nombre
-- Alt+K, h   → abrir "home"
-- Alt+K, b   → buscar en el documento
-- Alt+K, k   → insertar enlace
-- Alt+K, m   → esquema de títulos
-- Alt+K, d   → eliminar línea
-- Alt+K, c   → paleta de comandos de Monaco (F1)
-- Alt+K, x   → cerrar repositorio/carpeta
-- Alt+K, l   → alternar barra lateral
-- Alt+K, e / v / t → modo edición / vista previa / texto
-- Alt+K, u   → alternar tema claro/oscuro
-- Alt+K, i   → alternar idioma EU/ES
-- Alt+K, w   → alternar MAYÚSCULAS/minúsculas (sobre la selección)
+- Ctrl+. / Cmd+., s   → guardar
+- Ctrl+. / Cmd+., a   → guardar como
+- Ctrl+. / Cmd+., n   → nueva nota
+- Ctrl+. / Cmd+., o   → abrir carpeta
+- Ctrl+. / Cmd+., f   → abrir archivo del ordenador
+- Ctrl+. / Cmd+., g   → conectar/abrir panel de GitHub
+- Ctrl+. / Cmd+., p   → buscar y abrir archivo por nombre
+- Ctrl+. / Cmd+., h   → abrir "home"
+- Ctrl+. / Cmd+., b   → buscar en el documento
+- Ctrl+. / Cmd+., k   → insertar enlace
+- Ctrl+. / Cmd+., m   → esquema de títulos
+- Ctrl+. / Cmd+., d   → eliminar línea
+- Ctrl+. / Cmd+., c   → paleta de comandos de Monaco (F1)
+- Ctrl+. / Cmd+., x   → cerrar repositorio/carpeta
+- Ctrl+. / Cmd+., l   → alternar barra lateral
+- Ctrl+. / Cmd+., e / v / t → modo edición / vista previa / texto
+- Ctrl+. / Cmd+., u   → alternar tema claro/oscuro
+- Ctrl+. / Cmd+., i   → alternar idioma EU/ES
+- Ctrl+. / Cmd+., w   → alternar MAYÚSCULAS/minúsculas (sobre la selección)
 
 # Diccionarios incluidos en la app
 
