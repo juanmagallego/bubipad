@@ -886,4 +886,18 @@ button.wide {
   .file-search-item .fs-name {
     font-size: 14.5px;
   }
+
+  #tab-bar {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .explorer-root-label {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  .explorer-root-name {
+    font-size: 13px;
+  }
 }
