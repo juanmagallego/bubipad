@@ -905,7 +905,7 @@ if(Xtv){Xtv.addEventListener("input",bpTextToModel);Xtv.addEventListener("select
 async function bpLeaderToggleLang(){let cur=p2();try{cur==="es_ES"?await bpToggleDict("eu_ES"):await bpToggleDict("es_ES")}catch(e){xo(`\u26A0 ${e.message}`)}}
 function bpLeaderToggleCase(){if(lp!=="edit"){xo("Cambia a Monaco y selecciona texto");return}let model=Nt.getModel(),sel=Nt.getSelection();if(!model||!sel||sel.isEmpty()){xo("Selecciona texto primero"),Nt.focus();return}let text=model.getValueInRange(sel),newText=text===text.toUpperCase()?text.toLowerCase():text.toUpperCase(),startOffset=model.getOffsetAt(sel.getStartPosition());Nt.executeEdits("toggle-case",[{range:sel,text:newText}]);let m2=Nt.getModel(),startPos=m2.getPositionAt(startOffset),endPos=m2.getPositionAt(startOffset+newText.length);Nt.setSelection(new DF(startPos.lineNumber,startPos.column,endPos.lineNumber,endPos.column)),Nt.focus()}
 let bpLeaderActive=!1,bpLeaderTimer=null;
-const bpLeaderHint="Alt+K, letra: s guardar \xB7 a guardar como \xB7 n nueva \xB7 o carpeta \xB7 f archivo \xB7 g github \xB7 p buscar archivo \xB7 h home \xB7 b buscar texto \xB7 k enlace \xB7 m esquema \xB7 d eliminar l\xEDnea \xB7 c comandos \xB7 x cerrar repo \xB7 l lateral \xB7 e editor \xB7 v vista previa \xB7 t texto \xB7 u tema \xB7 i idioma \xB7 w May/min";
+const bpLeaderHint="Ctrl/Cmd+., letra: s guardar \xB7 a guardar como \xB7 n nueva \xB7 o carpeta \xB7 f archivo \xB7 g github \xB7 p buscar archivo \xB7 h home \xB7 b buscar texto \xB7 k enlace \xB7 m esquema \xB7 d eliminar l\xEDnea \xB7 c comandos \xB7 x cerrar repo \xB7 l lateral \xB7 e editor \xB7 v vista previa \xB7 t texto \xB7 u tema \xB7 i idioma \xB7 w May/min";
 const bpLeaderActions={
   s:()=>{Jre().then(()=>xo("Guardado")).catch(e=>e.name!=="AbortError"&&xo(`\u26A0 ${e.message}`))},
   a:()=>bpSaveAs(),
@@ -929,8 +929,10 @@ const bpLeaderActions={
   i:()=>bpLeaderToggleLang(),
   w:()=>bpLeaderToggleCase()
 };
+const bpIsMac=navigator.platform.toUpperCase().includes("MAC");
 document.addEventListener("keydown",o=>{
-  if(o.altKey&&!o.ctrlKey&&!o.metaKey&&!o.shiftKey&&o.key.toLowerCase()==="k"){
+  let bpLeaderCombo=(bpIsMac?o.metaKey:o.ctrlKey)&&!(bpIsMac?o.ctrlKey:o.metaKey)&&!o.altKey&&!o.shiftKey&&o.code==="Period";
+  if(bpLeaderCombo){
     o.preventDefault(),o.stopPropagation(),bpLeaderActive=!0,xo(bpLeaderHint),clearTimeout(bpLeaderTimer),bpLeaderTimer=setTimeout(()=>{bpLeaderActive=!1,xo("Listo")},4e3);
     return
   }
