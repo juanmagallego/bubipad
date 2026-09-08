@@ -687,15 +687,6 @@ button.wide {
   text-overflow: ellipsis;
 }
 
-.file-search-item .fs-path {
-  display: block;
-  font-size: 10.5px;
-  color: var(--btn-fg);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 #outline-popup {
   display: none;
   position: fixed;
