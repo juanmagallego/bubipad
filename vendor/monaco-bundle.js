@@ -1276,10 +1276,8 @@ function bpRenderFileSearchResults() {
   items.forEach((res, i) => {
     let el = document.createElement("div");
     el.className = "file-search-item" + (i === 0 ? " active" : "");
-    let folderPath = res.path.includes("/") ? res.path.slice(0, res.path.lastIndexOf("/")) : "";
-    el.innerHTML = `<span class="fs-name"></span><span class="fs-path"></span>`;
+    el.innerHTML = `<span class="fs-name"></span>`;
     el.querySelector(".fs-name").textContent = res.node.name;
-    el.querySelector(".fs-path").textContent = folderPath;
     el.addEventListener("click", () => bpOpenFileSearchResult(res));
     bpFileSearchResults.appendChild(el);
   });
