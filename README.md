@@ -2,6 +2,24 @@
 
 [https://juanmagallego.github.io/bubipad/](https://juanmagallego.github.io/bubipad/)
 
+# ATAJOS
+
+Alt+K, s   → guardar
+Alt+K, a   → guardar como
+Alt+K, n   → nueva nota
+Alt+K, o   → abrir carpeta
+Alt+K, f   → abrir archivo del ordenador
+Alt+K, g   → conectar/abrir panel de GitHub
+Alt+K, p   → buscar y abrir archivo por nombre
+Alt+K, h   → abrir "home"
+Alt+K, b   → buscar en el documento
+Alt+K, k   → insertar enlace
+Alt+K, m   → esquema de títulos
+Alt+K, d   → eliminar línea
+Alt+K, c   → paleta de comandos de Monaco (F1)
+Alt+K, x   → cerrar repositorio/carpeta
+Alt+K, l   → alternar barra lateral
+Alt+K, e / v / t → modo edición / vista previa / texto
 
 # Diccionarios incluidos en la app
 
