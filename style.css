@@ -873,4 +873,17 @@ button.wide {
   .font-btn-label {
     font-size: 13px;
   }
+
+  .tab {
+    font-size: 14px;
+    padding: 8px 10px;
+  }
+
+  .explorer-row {
+    font-size: 14px;
+  }
+
+  .file-search-item .fs-name {
+    font-size: 14.5px;
+  }
 }
