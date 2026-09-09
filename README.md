@@ -16,6 +16,11 @@ Directos (Monaco con foco)
 - Ctrl+Shift+G — aumentar tamaño de letra
 - Ctrl+Shift+P — reducir tamaño de letra
 
+
+Ctrl+Shift+X (atajo normal)
+
+
+
 A nivel de documento (funcionan sin importar el foco)
 
 - Ctrl+E — alternar Monaco / vista previa
@@ -49,6 +54,8 @@ A nivel de documento (funcionan sin importar el foco)
 - Ctrl+. / Cmd+., u   → alternar tema claro/oscuro
 - Ctrl+. / Cmd+., i   → alternar idioma EU/ES
 - Ctrl+. / Cmd+., w   → alternar MAYÚSCULAS/minúsculas (sobre la selección)
+
+
 
 # Diccionarios incluidos en la app
 
