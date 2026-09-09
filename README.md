@@ -4,6 +4,32 @@
 
 # ATAJOS
 
+Directos (Monaco con foco)
+
+Ctrl+S — guardar
+Ctrl+O — abrir carpeta
+Ctrl+B — negrita
+Ctrl+I — cursiva
+Ctrl+J — unir líneas
+Ctrl+U — minúsculas (selección)
+Ctrl+Shift+U — MAYÚSCULAS (selección)
+Ctrl+Shift+G — aumentar tamaño de letra
+Ctrl+Shift+P — reducir tamaño de letra
+
+A nivel de documento (funcionan sin importar el foco)
+
+Ctrl+E — alternar Monaco / vista previa
+Ctrl+K — insertar enlace
+Ctrl+H — abrir "home"
+Ctrl+P — buscar y abrir archivo por nombre
+Ctrl+Shift+D — eliminar línea
+Ctrl+Shift+M — esquema de títulos
+Ctrl+Shift+A — nueva nota
+Ctrl+Shift+O — abrir archivo del ordenador
+Ctrl+Shift+S — guardar como
+Ctrl+Shift+F — alternar barra lateral
+Alt+↑ / Alt+↓ — mover línea arriba/abajo (dentro de Monaco)
+
 - Ctrl+. / Cmd+., s   → guardar
 - Ctrl+. / Cmd+., a   → guardar como
 - Ctrl+. / Cmd+., n   → nueva nota
