@@ -33,6 +33,7 @@ A nivel de documento (funcionan sin importar el foco)
 - Ctrl+Shift+O — abrir archivo del ordenador
 - Ctrl+Shift+S — guardar como
 - Ctrl+Shift+F — alternar barra lateral
+- Ctrl+Shift+X - cerrar pestaña
 - Alt+↑ / Alt+↓ — mover línea arriba/abajo (dentro de Monaco
 
 - Ctrl+. / Cmd+., s   → guardar
@@ -54,7 +55,7 @@ A nivel de documento (funcionan sin importar el foco)
 - Ctrl+. / Cmd+., u   → alternar tema claro/oscuro
 - Ctrl+. / Cmd+., i   → alternar idioma EU/ES
 - Ctrl+. / Cmd+., w   → alternar MAYÚSCULAS/minúsculas (sobre la selección)
-
+- Ctrl+. / Cmd+., q cerrar pestaña
 
 
 # Diccionarios incluidos en la app
