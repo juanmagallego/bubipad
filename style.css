@@ -57,6 +57,10 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
+.toolbar-scroll-btn {
+  display: none;
+}
+
 
 .group {
   display: flex;
@@ -899,5 +903,42 @@ button.wide {
 
   .explorer-root-name {
     font-size: 13px;
+  }
+
+  #toolbar-wrap {
+    position: relative;
+  }
+
+  .toolbar-scroll-btn {
+    display: flex;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 22px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 0;
+    background: linear-gradient(to right, var(--toolbar-bg) 40%, transparent);
+    color: var(--btn-fg);
+    opacity: 0.55;
+    font-size: 20px;
+    line-height: 1;
+    z-index: 5;
+    padding: 0;
+  }
+
+  .toolbar-scroll-btn:hover,
+  .toolbar-scroll-btn:active {
+    opacity: 0.9;
+  }
+
+  .toolbar-scroll-left {
+    left: 0;
+  }
+
+  .toolbar-scroll-right {
+    right: 0;
+    background: linear-gradient(to left, var(--toolbar-bg) 40%, transparent);
   }
 }
