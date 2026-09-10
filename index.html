@@ -58,6 +58,25 @@
             <path d="M6.3 13.6 v-4 a0.6 0.6 0 0 1 0.6 -0.6 h2.2 a0.6 0.6 0 0 1 0.6 0.6 v4"/>
           </svg>
         </button>
+        <button id="delete-line-btn" title="Eliminar línea (Ctrl+Shift+D)">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5.5 h10"/>
+            <path d="M6.5 5.5 v-1.3 a1 1 0 0 1 1 -1 h1 a1 1 0 0 1 1 1 v1.3"/>
+            <path d="M4.5 5.5 l0.7 6.5 a1 1 0 0 0 1 0.9 h3.6 a1 1 0 0 0 1 -0.9 l0.7 -6.5"/>
+          </svg>
+        </button>
+        <button id="move-line-up-btn" title="Mover línea arriba (Alt+↑)">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 13 V3"/>
+            <path d="M4.5 6.5 L8 3 L11.5 6.5"/>
+          </svg>
+        </button>
+        <button id="move-line-down-btn" title="Mover línea abajo (Alt+↓)">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 3 V13"/>
+            <path d="M4.5 9.5 L8 13 L11.5 9.5"/>
+          </svg>
+        </button>
         <button id="text-btn" title="Modo texto plano, edición sencilla y con selección táctil nativa">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M2.5 4 h11 M2.5 8 h11 M2.5 12 h7"/>
@@ -95,9 +114,9 @@
         </button>
         <button id="outline-btn" title="Esquema de títulos del documento (Ctrl+Shift+M)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2.5 3.5 h11"/>
-            <path d="M4.5 7.5 h9"/>
-            <path d="M6.5 11.5 h7"/>
+            <path d="M2.5 3.5 h4.5"/>
+            <path d="M5 7.5 h6.5"/>
+            <path d="M7.5 11.5 h5.5"/>
           </svg>
         </button>
         <button id="search-btn" title="Buscar en el documento (Ctrl+F)">
@@ -115,27 +134,8 @@
         <button id="f1-btn" title="Paleta de comandos de Monaco (F1), aplicable sobre texto seleccionado">
           <span class="font-btn-label">F1</span>
         </button>
-        <button id="move-line-up-btn" title="Mover línea arriba (Alt+↑)">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 13 V3"/>
-            <path d="M4.5 6.5 L8 3 L11.5 6.5"/>
-          </svg>
-        </button>
-        <button id="move-line-down-btn" title="Mover línea abajo (Alt+↓)">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M8 3 V13"/>
-            <path d="M4.5 9.5 L8 13 L11.5 9.5"/>
-          </svg>
-        </button>
         <button id="join-lines-btn" title="Unir líneas (Ctrl+J)">
           <span class="font-btn-label">J</span>
-        </button>
-        <button id="delete-line-btn" title="Eliminar línea (Ctrl+Shift+D)">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 5.5 h10"/>
-            <path d="M6.5 5.5 v-1.3 a1 1 0 0 1 1 -1 h1 a1 1 0 0 1 1 1 v1.3"/>
-            <path d="M4.5 5.5 l0.7 6.5 a1 1 0 0 0 1 0.9 h3.6 a1 1 0 0 0 1 -0.9 l0.7 -6.5"/>
-          </svg>
         </button>
       </div>
       <div class="group right">
@@ -173,7 +173,10 @@
           <p class="empty-hint">Crea uno nuevo (Ctrl+Shift+A) o abre uno del ordenador (Ctrl+Shift+O)</p>
         </div>
         <div id="editor"></div>
-        <textarea id="text-view" spellcheck="true" autocapitalize="sentences" autocomplete="off" autocorrect="on"></textarea>
+        <div id="text-view-wrap">
+          <div id="text-view-highlight" aria-hidden="true"></div>
+          <textarea id="text-view" spellcheck="true" autocapitalize="sentences" autocomplete="off" autocorrect="on"></textarea>
+        </div>
         <div id="preview-view"></div>
       </div>
     </div>
