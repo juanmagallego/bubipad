@@ -1,0 +1,74 @@
+/* ============================================================
+   fonts.css — Tipografía monoespaciada de BubiPad
+   ============================================================
+   Para cambiar la fuente de TODA la app (modo texto, editor
+   Monaco y bloques de código de la vista previa), cambia solo
+   el valor de --app-mono-font aquí abajo. Tiene que coincidir
+   exactamente con el nombre usado en uno de los bloques
+   @font-face de este mismo archivo.
+
+   Fuentes disponibles ahora mismo:
+     "Courier Prime"   (la de siempre)
+     "Roboto Mono"     (alternativa, misma licencia)
+
+   Para añadir una fuente nueva:
+     1. Consigue los .woff2 (normal 400, negrita 700, cursiva
+        400 italic) y ponlos en /fonts.
+     2. Copia uno de los bloques @font-face de abajo y cambia
+        el nombre de familia y las rutas a los nuevos archivos.
+     3. Cambia --app-mono-font al nuevo nombre.
+     4. Añade las rutas de los nuevos .woff2 a APP_SHELL en
+        sw.js, y sube la versión de CACHE_NAME para que se
+        actualice en los dispositivos ya instalados.
+   ============================================================ */
+
+:root {
+  --app-mono-font: "Courier Prime";
+  --app-mono-fallback: Consolas, "Courier New", monospace;
+}
+
+/* ---- Courier Prime (SIL Open Font License 1.1) ---- */
+@font-face {
+  font-family: "Courier Prime";
+  src: url("fonts/courier-prime-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime";
+  src: url("fonts/courier-prime-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Courier Prime";
+  src: url("fonts/courier-prime-latin-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ---- Roboto Mono (SIL Open Font License 1.1) ---- */
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/roboto-mono-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/roboto-mono-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Roboto Mono";
+  src: url("fonts/roboto-mono-latin-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}

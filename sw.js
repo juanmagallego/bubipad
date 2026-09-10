@@ -1,8 +1,9 @@
-const CACHE_NAME = "bubipad-shell-v6";
+const CACHE_NAME = "bubipad-shell-v7";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./style.css",
+  "./fonts.css",
   "./storage-shim.js",
   "./manifest.webmanifest",
   "./vendor/monaco-bundle.js",
@@ -12,6 +13,9 @@ const APP_SHELL = [
   "./fonts/courier-prime-latin-400-normal.woff2",
   "./fonts/courier-prime-latin-400-italic.woff2",
   "./fonts/courier-prime-latin-700-normal.woff2",
+  "./fonts/roboto-mono-latin-400-normal.woff2",
+  "./fonts/roboto-mono-latin-400-italic.woff2",
+  "./fonts/roboto-mono-latin-700-normal.woff2",
   "./icons/icon16.png",
   "./icons/icon48.png",
   "./icons/icon128.png",

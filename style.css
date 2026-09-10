@@ -414,27 +414,7 @@ button.wide {
   opacity: 0.7;
 }
 
-@font-face {
-  font-family: "Courier Prime";
-  src: url("fonts/courier-prime-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Courier Prime";
-  src: url("fonts/courier-prime-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Courier Prime";
-  src: url("fonts/courier-prime-latin-400-italic.woff2") format("woff2");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
+
 
 #text-view {
   display: none;
@@ -450,7 +430,7 @@ button.wide {
   overflow-wrap: break-word;
   background: var(--bg);
   color: var(--text-fg);
-  font-family: "Courier Prime", Consolas, "Courier New", monospace;
+  font-family: var(--app-mono-font), var(--app-mono-fallback);
   font-size: 16px;
   line-height: 1.6;
   padding: 12px 20px;
@@ -472,7 +452,7 @@ button.wide {
   word-break: break-word;
   background: var(--bg);
   color: var(--text-fg);
-  font-family: "Courier Prime", Consolas, "Courier New", monospace;
+  font-family: var(--app-mono-font), var(--app-mono-fallback);
   font-size: 14px;
   line-height: 1.6;
   padding: 12px 20px;
@@ -505,7 +485,7 @@ button.wide {
 }
 
 #preview-view code {
-  font-family: Consolas, "Courier New", monospace;
+  font-family: var(--app-mono-font), var(--app-mono-fallback);
   background: var(--btn-bg);
   border: 1px solid var(--btn-border);
   border-radius: 3px;
@@ -783,7 +763,7 @@ button.wide {
 }
 
 .lang-hint code {
-  font-family: Consolas, monospace;
+  font-family: var(--app-mono-font), var(--app-mono-fallback);
   background: var(--btn-bg);
   border-radius: 3px;
   padding: 0 3px;
