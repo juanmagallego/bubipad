@@ -23,7 +23,7 @@
    ============================================================ */
 
 :root {
-  --app-mono-font: "Courier Prime";
+  --app-mono-font: "Roboto Mono";
   --app-mono-fallback: Consolas, "Courier New", monospace;
 }
 
