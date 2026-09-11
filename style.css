@@ -15,10 +15,6 @@
   --accent: #007acc;
   --accent-hover: #1177bb;
   --link-color: #ffd700;
-  --mdh-heading: #4fc1ff;
-  --mdh-bold: #f2c94c;
-  --mdh-italic: #c586c0;
-  --mdh-code: #ce9178;
 }
 
 html[data-theme="light"] {
@@ -34,10 +30,6 @@ html[data-theme="light"] {
   --accent: #007acc;
   --accent-hover: #1177bb;
   --link-color: #0047ab;
-  --mdh-heading: #0057b7;
-  --mdh-bold: #a06b00;
-  --mdh-italic: #8e44ad;
-  --mdh-code: #a31515;
 }
 
 html, body {
@@ -424,84 +416,28 @@ button.wide {
 
 
 
-#text-view-wrap {
+#text-view {
   display: none;
   flex: 1;
   min-height: 0;
   min-width: 0;
-  position: relative;
-  overflow: hidden;
-}
-
-#text-view-highlight,
-#text-view {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
-  margin: 0;
+  resize: none;
   border: none;
+  outline: none;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  background: var(--bg);
+  color: var(--text-fg);
   font-family: var(--app-mono-font), var(--app-mono-fallback);
   font-size: 16px;
-  font-weight: 400;
-  font-style: normal;
   line-height: 1.6;
   padding: 12px 20px;
   box-sizing: border-box;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-  scrollbar-gutter: stable;
-}
-
-#text-view-highlight {
-  z-index: 1;
-  overflow: hidden;
-  color: var(--text-fg);
-  background: var(--bg);
-  pointer-events: none;
-}
-
-#text-view {
-  z-index: 2;
-  resize: none;
-  outline: none;
-  overflow-y: auto;
-  background: transparent;
-  color: transparent;
-  caret-color: var(--text-fg);
   -webkit-user-select: text;
   user-select: text;
   touch-action: manipulation;
-}
-
-#text-view-highlight .mdh-marker {
-  opacity: 0.5;
-}
-
-#text-view-highlight .mdh-heading {
-  color: var(--mdh-heading);
-}
-
-#text-view-highlight .mdh-bold {
-  color: var(--mdh-bold);
-}
-
-#text-view-highlight .mdh-italic {
-  color: var(--mdh-italic);
-}
-
-#text-view-highlight .mdh-code {
-  color: var(--mdh-code);
-}
-
-#text-view-highlight .mdh-link {
-  color: var(--link-color);
-  text-decoration: underline;
-}
-
-#text-view-highlight .mdh-linkurl {
-  color: var(--link-color);
-  opacity: 0.6;
 }
 
 #preview-view {
