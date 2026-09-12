@@ -905,7 +905,7 @@ if(Xtv){Xtv.addEventListener("input",bpTextToModel);Xtv.addEventListener("select
 async function bpLeaderToggleLang(){let cur=p2();try{cur==="es_ES"?await bpToggleDict("eu_ES"):await bpToggleDict("es_ES")}catch(e){xo(`\u26A0 ${e.message}`)}}
 function bpLeaderToggleCase(){if(lp!=="edit"){xo("Cambia a Monaco y selecciona texto");return}let model=Nt.getModel(),sel=Nt.getSelection();if(!model||!sel||sel.isEmpty()){xo("Selecciona texto primero"),Nt.focus();return}let text=model.getValueInRange(sel),newText=text===text.toUpperCase()?text.toLowerCase():text.toUpperCase(),startOffset=model.getOffsetAt(sel.getStartPosition());Nt.executeEdits("toggle-case",[{range:sel,text:newText}]);let m2=Nt.getModel(),startPos=m2.getPositionAt(startOffset),endPos=m2.getPositionAt(startOffset+newText.length);Nt.setSelection(new DF(startPos.lineNumber,startPos.column,endPos.lineNumber,endPos.column)),Nt.focus()}
 let bpLeaderActive=!1,bpLeaderTimer=null;
-const bpLeaderHint="Ctrl+., letra: s guardar \xB7 a guardar como \xB7 n nueva \xB7 o carpeta \xB7 b archivo \xB7 g github \xB7 p buscar archivo \xB7 h home \xB7 f buscar texto \xB7 k enlace \xB7 m esquema \xB7 d eliminar l\xEDnea \xB7 c comandos \xB7 x cerrar repo \xB7 l tema \xB7 e editor \xB7 v vista previa \xB7 t texto \xB7 i idioma \xB7 w May/min \xB7 q cerrar pesta\xF1a \xB7 j unir l\xEDneas";
+const bpLeaderHint="Ctrl+., letra: s guardar \xB7 a guardar como \xB7 n nueva \xB7 o carpeta \xB7 b archivo \xB7 g github \xB7 p buscar archivo \xB7 h home \xB7 f buscar texto \xB7 k enlace \xB7 m esquema \xB7 d eliminar l\xEDnea \xB7 c comandos \xB7 x cerrar repo \xB7 l tema \xB7 e editor \xB7 v vista previa \xB7 t texto \xB7 i idioma \xB7 w May/min \xB7 q cerrar pesta\xF1a \xB7 j unir l\xEDneas \xB7 Tab pesta\xF1a siguiente \xB7 Shift+Tab anterior";
 const bpLeaderActions={
   s:()=>{Jre().then(()=>xo("Guardado")).catch(e=>e.name!=="AbortError"&&xo(`\u26A0 ${e.message}`))},
   a:()=>bpSaveAs(),
@@ -940,6 +940,7 @@ document.addEventListener("keydown",o=>{
     let key=o.key.toLowerCase();
     bpLeaderActive=!1;
     if(key==="escape"){xo("Cancelado");return}
+    if(key==="tab"){bpCycleTab(o.shiftKey?-1:1);return}
     let action=bpLeaderActions[key];
     if(action)try{action()}catch(e){xo(`\u26A0 ${e.message}`)}
     else xo("Comando no reconocido")
@@ -1393,6 +1394,8 @@ document.addEventListener("click", o => {
 });
 
 async function bpCloseCurrentTab(){if(!Jb){xo("Ning\xFAn archivo abierto");return}await p0e(Jb)}
+function bpCycleTab(dir){if(!ta.length)return;let idx=ta.findIndex(t=>t.id===Jb);if(idx===-1)idx=0;let newIdx=(idx+dir+ta.length)%ta.length;Yb(ta[newIdx].id)}
+document.addEventListener("keydown",o=>{!bpLeaderActive&&(o.ctrlKey||o.metaKey)&&!o.altKey&&o.key==="Tab"&&(o.preventDefault(),bpCycleTab(o.shiftKey?-1:1))},true);
 document.addEventListener("keydown",o=>{(o.ctrlKey||o.metaKey)&&!o.altKey&&o.shiftKey&&o.key.toLowerCase()==="x"&&(o.preventDefault(),bpCloseCurrentTab())},true);
 let bpToolbarScrollLeft = document.getElementById("toolbar-scroll-left");
 let bpToolbarScrollRight = document.getElementById("toolbar-scroll-right");
