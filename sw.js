@@ -1,4 +1,16 @@
-const CACHE_NAME = "bubipad-shell-v7";
+const CACHE_NAME = "bubipad-shell-v8";
+
+// Recursos grandes y estables: se sirven desde caché (rápido) y se
+// actualizan en segundo plano. Todo lo demás (el código de la app) se
+// pide primero a la red, para no arrancar nunca con una versión vieja.
+function isStaticAsset(url) {
+  return (
+    url.includes("/fonts/") ||
+    url.includes("/dic/") ||
+    url.includes("/icons/") ||
+    url.includes("codicon.ttf")
+  );
+}
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -53,18 +65,35 @@ self.addEventListener("fetch", (event) => {
   // Nunca cachear llamadas a la API de GitHub: siempre red.
   if (req.url.includes("api.github.com")) return;
 
+  // Recursos estáticos pesados: caché primero, refresco en segundo plano.
+  if (isStaticAsset(req.url)) {
+    event.respondWith(
+      caches.match(req).then((cached) => {
+        const network = fetch(req)
+          .then((res) => {
+            if (res && res.status === 200 && res.type === "basic") {
+              const copy = res.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+            }
+            return res;
+          })
+          .catch(() => cached);
+        return cached || network;
+      })
+    );
+    return;
+  }
+
+  // Código de la app: red primero, caché como respaldo sin conexión.
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const network = fetch(req)
-        .then((res) => {
-          if (res && res.status === 200 && res.type === "basic") {
-            const copy = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || network;
-    })
+    fetch(req)
+      .then((res) => {
+        if (res && res.status === 200 && res.type === "basic") {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req))
   );
 });

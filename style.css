@@ -822,6 +822,42 @@ button.wide {
   border-color: var(--accent);
 }
 
+#update-banner {
+  position: fixed;
+  right: 16px;
+  bottom: 40px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--toolbar-bg);
+  color: var(--text-fg);
+  font-size: 13px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+#update-banner button {
+  width: auto;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+
+#update-reload-btn {
+  background: var(--accent);
+  border-color: var(--accent-hover);
+  color: #fff;
+}
+
+#update-dismiss-btn {
+  width: 26px;
+  padding: 0;
+}
+
 @media (max-width: 640px) {
   #toolbar {
     flex-wrap: nowrap;
