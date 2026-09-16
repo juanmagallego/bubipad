@@ -1002,7 +1002,9 @@ async function bpGhApi(path, opts = {}) {
     let msg = body && body.message ? body.message : res.statusText;
     if (res.status === 401) msg = "Token inv\u00E1lido o sin permisos suficientes.";
     if (res.status === 404) msg = "Repositorio, rama o archivo no encontrado (revisa el nombre y los permisos del token).";
-    throw new Error(`GitHub: ${msg}`);
+    let err = new Error(`GitHub: ${msg}`);
+    err.status = res.status;
+    throw err;
   }
   if (res.status === 204) return null;
   return res.json();
@@ -1141,6 +1143,7 @@ var bpBinaryExts=new Set(["png","jpg","jpeg","gif","webp","bmp","ico","svg","tif
         refrescadas++;
         conflictos--;
       } else {
+        tab.handle = Object.assign({}, h, { sha: data.sha });
         tab.conflictSha = data.sha;
       }
     }
@@ -1189,11 +1192,28 @@ async function bpGhSaveTab(tab) {
     branch: h.branch
   };
   if (h.sha) body.sha = h.sha;
-  let res = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
+  let res;
+  try {
+    res = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  } catch (e) {
+    let shaMismatch = e.status === 409 || (e.status === 422 && /sha/i.test(e.message));
+    if (!shaMismatch) throw e;
+    // El sha que teníamos guardado ya no es el vigente (por ejemplo, tras
+    // resolver una comprobación de cambios remotos). Pedimos el sha actual
+    // y reintentamos una sola vez con él, en vez de fallar sin más.
+    let actual = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}?ref=${encodeURIComponent(h.branch)}`);
+    if (Array.isArray(actual) || actual.encoding !== "base64") throw e;
+    body.sha = actual.sha;
+    res = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+  }
   tab.handle = Object.assign({}, h, { sha: res.content.sha });
 }
 
