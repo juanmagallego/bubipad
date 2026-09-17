@@ -1142,12 +1142,23 @@ async function bpGhSaveTab(tab) {
     branch: h.branch
   };
   if (h.sha) body.sha = h.sha;
-  let res = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-  tab.handle = Object.assign({}, h, { sha: res.content.sha });
+  try {
+    let res = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    tab.handle = Object.assign({}, h, { sha: res.content.sha });
+  } catch (e) {
+    if (/does not match/.test(e.message)) {
+      try {
+        let fresh = await bpGhApi(`/repos/${h.owner}/${h.repo}/contents/${bpGhEncodePath(h.path)}?ref=${encodeURIComponent(h.branch)}`);
+        tab.handle = Object.assign({}, h, { sha: fresh.sha });
+      } catch {}
+      throw new Error(`"${h.path}" se modific\u00F3 en GitHub desde otro sitio. Vuelve a guardar para sobrescribir con tu versi\u00F3n.`);
+    }
+    throw e;
+  }
 }
 
 async function bpGhCreateFile(parentNode, name) {
