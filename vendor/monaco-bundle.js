@@ -1184,6 +1184,19 @@ async function bpGhOpenFile(node) {
   }
 }
 
+function bpGhSyncTreeNodeSha(h, sha) {
+  if (!wr || !wr.handle || !wr.handle.__gh) return;
+  function walk(node) {
+    if (node.handle && node.handle.__gh && node.handle.owner === h.owner && node.handle.repo === h.repo && node.handle.branch === h.branch && node.handle.path === h.path) {
+      node.handle = Object.assign({}, node.handle, { sha });
+      return true;
+    }
+    if (node.children) for (let c of node.children) if (walk(c)) return true;
+    return false;
+  }
+  walk(wr);
+}
+
 async function bpGhSaveTab(tab) {
   let h = tab.handle;
   let body = {
@@ -1215,6 +1228,7 @@ async function bpGhSaveTab(tab) {
     });
   }
   tab.handle = Object.assign({}, h, { sha: res.content.sha });
+  bpGhSyncTreeNodeSha(h, res.content.sha);
 }
 
 async function bpGhCreateFile(parentNode, name) {
