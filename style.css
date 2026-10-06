@@ -955,19 +955,3 @@ the editor instead of pushing it, so Monaco never has to relayout. */
     background: linear-gradient(to left, var(--toolbar-bg) 40%, transparent);
   }
 }
-
-/* ---------------------------------------------------------------------- */
-/* PRUEBA TEMPORAL de nitidez en iPad (fuera del @media).                 */
-/* Si no cambia nada, bórrala. Si se ve nítido, ve quitando propiedades   */
-/* una a una hasta dar con la culpable.                                   */
-/* ---------------------------------------------------------------------- */
-
-#toolbar, #toolbar * {
-  filter: none !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  transform: none !important;
-  will-change: auto !important;
-  text-shadow: none !important;
-  box-shadow: none !important;
-}
