@@ -61,7 +61,6 @@ html, body {
   display: none;
 }
 
-
 .group {
   display: flex;
   gap: 4px;
@@ -141,7 +140,7 @@ button.wide {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Tab bar                                                                  */
+/* Tab bar */
 /* ---------------------------------------------------------------------- */
 
 #tab-bar {
@@ -237,7 +236,7 @@ button.wide {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Workspace: sidebar + main panel                                         */
+/* Workspace: sidebar + main panel */
 /* ---------------------------------------------------------------------- */
 
 #workspace {
@@ -260,7 +259,7 @@ button.wide {
 }
 
 /* Shown temporarily by hovering the left edge of the screen: floats over
-   the editor instead of pushing it, so Monaco never has to relayout. */
+the editor instead of pushing it, so Monaco never has to relayout. */
 #sidebar.peek {
   position: absolute;
   top: 0;
@@ -413,8 +412,6 @@ button.wide {
   font-size: 11px;
   opacity: 0.7;
 }
-
-
 
 #text-view {
   display: none;
@@ -575,7 +572,7 @@ button.wide {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Emoji picker popup                                                      */
+/* Emoji picker popup */
 /* ---------------------------------------------------------------------- */
 
 #emoji-popup {
@@ -622,7 +619,7 @@ button.wide {
 }
 
 /* ---------------------------------------------------------------------- */
-/* Hunspell squiggly underline + language popup                            */
+/* Hunspell squiggly underline + language popup */
 /* ---------------------------------------------------------------------- */
 
 .hunspell-error {
@@ -770,7 +767,7 @@ button.wide {
 }
 
 /* ---------------------------------------------------------------------- */
-/* GitHub remote repositories popup                                        */
+/* GitHub remote repositories popup */
 /* ---------------------------------------------------------------------- */
 
 #github-popup {
@@ -956,14 +953,21 @@ button.wide {
   .toolbar-scroll-right {
     right: 0;
     background: linear-gradient(to left, var(--toolbar-bg) 40%, transparent);
-    
-  #toolbar, #toolbar * {
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* PRUEBA TEMPORAL de nitidez en iPad (fuera del @media).                 */
+/* Si no cambia nada, bórrala. Si se ve nítido, ve quitando propiedades   */
+/* una a una hasta dar con la culpable.                                   */
+/* ---------------------------------------------------------------------- */
+
+#toolbar, #toolbar * {
   filter: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   transform: none !important;
   will-change: auto !important;
   text-shadow: none !important;
-}
-  }
+  box-shadow: none !important;
 }
