@@ -1,0 +1,14 @@
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[user]
+	name = Juanma Gallego
+	email = juanmagallego@outlook.es
+	mail = juanmagallego@outlook.es
+[credential]
+	helper = osxkeychain
+[alias]
+	igo  = "!f() { git add -A && git commit -m "$*" && git push; }; f"
+
