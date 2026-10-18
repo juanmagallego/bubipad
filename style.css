@@ -955,3 +955,192 @@ the editor instead of pushing it, so Monaco never has to relayout. */
     background: linear-gradient(to left, var(--toolbar-bg) 40%, transparent);
   }
 }
+
+/* ---------------------------------------------------------------------- */
+/* Chip de modo, estado vacío, lista emergente y ayuda                      */
+/* ---------------------------------------------------------------------- */
+
+#status-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+button.mode-chip {
+  display: none;
+  width: auto;
+  height: 17px;
+  min-width: 26px;
+  padding: 0 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+
+button.mode-chip:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+button.mode-chip.preview {
+  background: #fbbf24;
+  border-color: #fbbf24;
+  color: #1c1917;
+}
+
+#empty-state .empty-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--text-fg);
+}
+
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+button.empty-btn {
+  width: auto;
+  height: 32px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  gap: 6px;
+}
+
+#bp-list-popup {
+  display: none;
+  position: fixed;
+  z-index: 300;
+  min-width: 240px;
+  max-width: min(420px, calc(100vw - 16px));
+  max-height: 60vh;
+  overflow-y: auto;
+  background: var(--toolbar-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  padding: 6px;
+  color: var(--text-fg);
+}
+
+.bp-list-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--btn-fg);
+  padding: 2px 8px 6px;
+}
+
+.bp-list-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12.5px;
+}
+
+.bp-list-item:hover,
+.bp-list-item.active {
+  background: var(--btn-bg-hover);
+}
+
+.bp-list-num {
+  width: 10px;
+  color: var(--btn-fg);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.bp-list-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bp-list-hint {
+  margin-left: auto;
+  padding-left: 10px;
+  color: var(--btn-fg);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 45%;
+}
+
+#help-popup {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+  padding: 24px 12px;
+}
+
+.bp-help-card {
+  max-width: 640px;
+  margin: 0 auto;
+  background: var(--toolbar-bg);
+  color: var(--text-fg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px 18px;
+  font-size: 13px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.bp-help-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.bp-help-note {
+  font-size: 12px;
+  color: var(--btn-fg);
+  margin: 6px 0 2px;
+}
+
+.bp-help-card h3 {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--accent);
+  margin: 14px 0 4px;
+}
+
+.bp-help-card table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.bp-help-card td {
+  padding: 2px 6px 2px 0;
+  vertical-align: top;
+}
+
+.bp-help-card td:first-child {
+  white-space: nowrap;
+  width: 1%;
+  padding-right: 14px;
+}
+
+.bp-help-card kbd {
+  font-family: inherit;
+  font-size: 11.5px;
+  background: var(--btn-bg);
+  border: 1px solid var(--btn-border);
+  border-radius: 3px;
+  padding: 1px 5px;
+}

@@ -1,69 +1,77 @@
 ## Atajos de teclado
- 
-En todos los casos, `Ctrl` equivale a `Cmd` en macOS.
- 
-### Atajos directos
- 
-- `Ctrl+S` — Guardar
-- `Ctrl+Shift+S` — Guardar como
-- `Ctrl+O` — Abrir carpeta *(requiere que Monaco tenga el foco)*
-- `Ctrl+Shift+O` — Abrir archivo del ordenador
-- `Ctrl+Shift+A` — Nueva nota
-- `Ctrl+Shift+F` — Mostrar/ocultar el explorador (barra lateral)
-- `Ctrl+E` — Alternar entre editor Monaco y vista previa
-- `Ctrl+P` — Buscar y abrir archivo por nombre
-- `Ctrl+H` — Abrir el archivo "home" del repositorio/carpeta
-- `Ctrl+K` — Insertar enlace (usa el portapapeles como URL si hay algo copiado)
-- `Ctrl+Shift+D` — Eliminar línea
-- `Ctrl+Shift+M` — Esquema de títulos del documento
-- `Ctrl+Shift+X` — Cerrar la pestaña actual
-- `Ctrl+L` — Alternar tema claro/oscuro
-- `Ctrl+Tab` / `Ctrl+Shift+Tab` — Pestaña siguiente / anterior *(puede no llegar a la app si el navegador lo reserva para sus propias pestañas; funciona de forma fiable vía la tecla líder, ver abajo)*
-- `Ctrl+B` — Negrita *(Monaco)*
-- `Ctrl+I` — Cursiva *(Monaco)*
-- `Ctrl+J` — Unir líneas *(Monaco)*
-- `Ctrl+U` — minúsculas sobre la selección *(Monaco)*
-- `Ctrl+Shift+U` — MAYÚSCULAS sobre la selección *(Monaco)*
-- `Ctrl+Shift+G` — Aumentar tamaño de letra
-- `Ctrl+Shift+P` — Reducir tamaño de letra
-- `Alt+↑` / `Alt+↓` — Mover línea arriba/abajo *(Monaco)*
-- `F1` — Paleta de comandos de Monaco *(también disponible como botón, para táctil)*
-- `Enter` en una lista (`- `, `* `, `1. `, `- [ ] `) — Continúa la lista en la línea siguiente; si el elemento está vacío, la termina *(Monaco y modo texto)*
-### Tecla líder: `Ctrl+.` (Ctrl + punto), luego una letra
- 
-Al pulsar `Ctrl+.` aparece un aviso en la barra de estado esperando la siguiente tecla (4 segundos de margen, o `Escape` para cancelar):
- 
-- `s` — Guardar
-- `a` — Guardar como
-- `n` — Nueva nota
-- `o` — Abrir carpeta
-- `b` — Abrir archivo del ordenador
-- `g` — Conectar/abrir panel de GitHub
-- `p` — Buscar y abrir archivo por nombre
-- `h` — Abrir "home"
-- `f` — Buscar en el documento
-- `k` — Insertar enlace
-- `m` — Esquema de títulos
-- `d` — Eliminar línea
-- `c` — Paleta de comandos de Monaco
-- `x` — Cerrar repositorio/carpeta
-- `l` — Alternar tema claro/oscuro
-- `e` — Cambiar a modo editor (Monaco)
-- `v` — Cambiar a modo vista previa
-- `t` — Cambiar a modo texto
-- `i` — Alternar idioma del corrector (EU/ES)
-- `w` — Alternar MAYÚSCULAS/minúsculas sobre la selección
-- `q` — Cerrar la pestaña actual
-- `j` — Unir líneas
-- `Tab` — Pestaña siguiente
-- `Shift+Tab` — Pestaña anterior
+
+Los atajos son los mismos que en la versión de terminal de BubiPad, salvo los que el navegador reserva para sí. `Ctrl` equivale a `Cmd` en macOS. La pantalla de ayuda (botón `?`, o `Ctrl+.` y luego `?`) los lista todos.
+
+En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado escribe otros caracteres): ahí valen la tecla líder y el resto de atajos.
+
+### Archivos y navegación
+
+- `Ctrl+N` / `Ctrl+Shift+A` — Nueva nota
+- `Ctrl+S` — Guardar · `Ctrl+Shift+S` — Guardar como
+- `Ctrl+O` — Buscar y abrir archivo por nombre
+- `Alt+O` / `Ctrl+Shift+O` — Abrir archivo del ordenador
+- `Ctrl+P` / `F9` / `Ctrl+Shift+F` — Mostrar u ocultar el explorador
+- `Alt+H` — Abrir el archivo «home»
+- `Ctrl+W` / `Ctrl+Shift+X` — Cerrar la pestaña actual
+- `Ctrl+T` / `Ctrl+Shift+M` — Esquema del documento (en vista previa salta al título sin cambiar de modo)
+- `Alt+R` — Panel de GitHub
+- `F4` — Abrir el enlace bajo el cursor
+
+### Pestañas e historial
+
+- `Alt+RePág` / `Alt+AvPág` — Pestaña anterior / siguiente (también `Alt+←` / `Alt+→` fuera de macOS, y `Ctrl+Tab` si el navegador lo deja pasar)
+- `Alt+1` … `Alt+8` — Ir a esa pestaña · `Alt+9` — la última
+- `Alt+Shift+←` / `Alt+Shift+→` — Atrás / adelante en el historial de pestañas (en vista previa también `Retroceso` para ir atrás)
+
+### Vista
+
+- `Ctrl+E` — Alternar vista previa ↔ edición (vuelve al último modo de edición usado: Monaco o texto). También con el chip ■/□ de la barra de estado (■ amarillo = vista previa, □ = edición) y con los iconos del editor y del ojo de la barra de herramientas cuando ya están activos
+- `Ctrl+L` — Tema claro/oscuro
+- `Alt+=` / `Alt+−` — Aumentar / reducir el zoom (también `Ctrl+Shift+G` para aumentar)
+- `e` en la vista previa — Editar
+
+### Edición
+
+- `Ctrl+B` / `Ctrl+I` (o `Alt+I`) — Negrita / cursiva · `Ctrl+K` — Insertar enlace (usa el portapapeles como URL)
+- `Alt+E` o `:` — Selector de emojis
+- `Ctrl+U` — minúsculas → MAYÚSCULAS → Título → minúsculas (sobre la selección o la palabra bajo el cursor)
+- `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Alt+L` — Seleccionar línea
+- `Ctrl+↑` / `Ctrl+↓` — Inicio / final del archivo (en macOS, `Cmd+↑/↓`)
+- `Alt+↑` / `Alt+↓` o `Ctrl+Shift+↑` / `Ctrl+Shift+↓` — Mover línea · `Alt+Shift+↑` / `Alt+Shift+↓` — Duplicar línea
+- `Alt+X` — Unicode ↔ carácter
+- `Ctrl+F` / `Ctrl+H` — Buscar / reemplazar · `F3` / `Shift+F3` — Siguiente / anterior
+- `F1` o `Ctrl+Shift+P` — Paleta de comandos de Monaco
+- `Enter` en una lista (`- `, `* `, `1. `, `- [ ] `) — Continúa la lista; si el elemento está vacío, la termina
+
+### Corrector ortográfico
+
+- `F6` — Alternar español ↔ euskera
+- `F7` / `Shift+F7` — Error siguiente / anterior
+- `F8` o `Alt+Intro` — Sugerencias para el error bajo el cursor, con opciones para añadir la palabra al diccionario (se guarda en el navegador) o ignorarla en la sesión
+
+### Tecla líder: `Ctrl+.` (o `F2`), luego una letra
+
+Al pulsarla aparece un aviso en la barra de estado esperando la siguiente tecla (4 segundos de margen, o `Escape` para cancelar):
+
+- `s` guardar · `a` guardar como · `n` nueva nota · `o` abrir carpeta · `b` abrir archivo del ordenador
+- `p` buscar archivo · `h` home · `g` panel de GitHub · `x` cerrar carpeta/repositorio · `q` cerrar pestaña
+- `f` buscar · `r` reemplazar · `k` insertar enlace · `m` esquema · `u` lista de enlaces de la nota
+- `e` editor · `v` vista previa · `t` texto plano
+- `d` eliminar línea · `j` unir líneas · `w` minúsculas/MAYÚSCULAS/Título · `c` paleta de comandos
+- `l` tema · `i` idioma del corrector · `+` / `-` zoom
+- `←` / `→` historial · `↑` / `↓` mover línea · `Tab` / `Shift+Tab` pestaña siguiente / anterior · `?` ayuda
+
+### Cambios respecto a versiones anteriores
+
+Para coincidir con la versión de terminal: `Ctrl+O` ahora busca archivo (antes abría carpeta; ahora es `Ctrl+.` `o`), `Ctrl+P` alterna el explorador (antes buscaba archivo), `Alt+H` abre «home» (antes `Ctrl+H`, que vuelve a ser «reemplazar» de Monaco), `Ctrl+D` elimina la línea (antes añadía la siguiente coincidencia a la selección; sigue disponible desde la paleta de comandos), `Ctrl+U` cicla mayúsculas/minúsculas/Título y `Ctrl+Shift+P` abre la paleta de comandos (antes reducía el tamaño de letra: ahora `Alt+−`).
+
 ### Notas sobre atajos reservados por el navegador
- 
-Algunas combinaciones (`Ctrl+P`, `Ctrl+K`, `Ctrl+H`, `Ctrl+Shift+O`, `Ctrl+Tab`, `Ctrl+L`...) coinciden con atajos que los navegadores reservan para sí mismos (imprimir, historial, barra de direcciones, cambio de pestaña del navegador, etc.). En esos casos la tecla puede no llegar nunca a la aplicación si se usa dentro de una pestaña normal del navegador. Dos formas de evitarlo:
- 
+
+Algunas combinaciones (`Ctrl+N`, `Ctrl+O`, `Ctrl+P`, `Ctrl+W`, `Ctrl+T`, `Ctrl+Tab`, `Ctrl+H`...) coinciden con atajos que los navegadores reservan para sí mismos. En una pestaña normal pueden no llegar nunca a la aplicación. Dos formas de evitarlo:
+
 - Instalar BubiPad como aplicación web (sin barra de navegador ni pestañas), donde estas combinaciones quedan libres.
-- Usar siempre la tecla líder (`Ctrl+.`), que no coincide con ningún atajo reservado conocido y ofrece una alternativa fiable para prácticamente todas las acciones.
- 
+- Usar siempre la tecla líder (`Ctrl+.` o `F2`), que no coincide con ningún atajo reservado conocido y ofrece una alternativa fiable para prácticamente todas las acciones.
+
 
 
 # Diccionarios incluidos en la app
