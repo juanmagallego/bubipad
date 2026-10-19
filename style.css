@@ -1121,8 +1121,16 @@ button.mode-chip.preview {
   padding: 1px 5px;
 }
 
-.file-search-item .fs-path {
-  opacity: 0.6;
-  margin-left: 10px;
+
+#repo-label {
+  display: none;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 11px;
+  font-weight: 600;
+  padding: 0 7px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.18);
 }
