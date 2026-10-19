@@ -172,14 +172,8 @@
       <div id="main-panel">
         <div id="tab-bar"></div>
         <div id="empty-state">
-          <p class="empty-title">BubiPad</p>
-          <div class="empty-actions">
-            <button id="empty-search-btn" type="button" class="empty-btn">📁 Archivo</button>
-            <button id="empty-home-btn" type="button" class="empty-btn">🏠 Home</button>
-            <button id="empty-github-btn" type="button" class="empty-btn">☁️ GitHub</button>
-            <button id="empty-folder-btn" type="button" class="empty-btn">📂 Carpeta</button>
-          </div>
-          <p class="empty-hint">Nueva nota: Ctrl+N o Ctrl+Shift+A · Buscar archivo: Ctrl+O · Abrir del ordenador: Alt+O o Ctrl+Shift+O · Ayuda: Ctrl+. y ?</p>
+          <p>Ningún archivo abierto</p>
+          <p class="empty-hint">Crea uno nuevo (Ctrl+Shift+A) o abre uno del ordenador (Ctrl+Shift+O)</p>
         </div>
         <div id="editor"></div>
         <textarea id="text-view" spellcheck="true" autocapitalize="sentences" autocomplete="off" autocorrect="on"></textarea>
@@ -198,7 +192,7 @@
   <div id="github-popup">
     <div id="github-status-text">Sin conectar</div>
     <input id="github-token-input" type="password" class="gh-input" placeholder="Token de acceso personal" autocomplete="off" />
-    <input id="github-repo-input" type="text" class="gh-input" placeholder="usuario/repositorio" autocomplete="off" />
+    <input id="github-repo-input" type="text" class="gh-input" placeholder="Repositorios (opcional): vacío = los que permita el token" title="Vacío: se abren todos los repositorios a los que da acceso el token. O escribe usuario/repo, usuario/otro" autocomplete="off" />
     <button id="github-connect-btn" class="wide">Conectar y abrir</button>
     <button id="github-forget-btn" class="wide">Olvidar credenciales</button>
   </div>

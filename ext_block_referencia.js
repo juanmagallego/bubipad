@@ -468,13 +468,6 @@ bpLeaderActions.arrowdown = () => bpMoveLine(1);
 bpLeaderActions["?"] = () => bpToggleHelp();
 bpLeaderActions.w = () => bpApplyCaseCycle();
 
-/* --- Estado vac\u00edo: botones de acceso r\u00e1pido (como la portada de la terminal) --- */
-
-document.getElementById("empty-search-btn")?.addEventListener("click", () => bpToggleFileSearchPopup());
-document.getElementById("empty-home-btn")?.addEventListener("click", () => bpOpenHomeFile());
-document.getElementById("empty-github-btn")?.addEventListener("click", () => bpGhTogglePopup());
-document.getElementById("empty-folder-btn")?.addEventListener("click", () => document.getElementById("open-folder-btn")?.click());
-
 /* --- Manejador \u00fanico de atajos (fase de captura) ----------------------- */
 
 function bpInEditorTarget(t) {

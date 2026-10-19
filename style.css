@@ -991,30 +991,6 @@ button.mode-chip.preview {
   color: #1c1917;
 }
 
-#empty-state .empty-title {
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  color: var(--text-fg);
-}
-
-.empty-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin: 8px 0;
-}
-
-button.empty-btn {
-  width: auto;
-  height: 32px;
-  padding: 0 14px;
-  font-size: 13px;
-  font-weight: 600;
-  gap: 6px;
-}
-
 #bp-list-popup {
   display: none;
   position: fixed;
@@ -1143,4 +1119,10 @@ button.empty-btn {
   border: 1px solid var(--btn-border);
   border-radius: 3px;
   padding: 1px 5px;
+}
+
+.file-search-item .fs-path {
+  opacity: 0.6;
+  margin-left: 10px;
+  font-size: 11px;
 }
