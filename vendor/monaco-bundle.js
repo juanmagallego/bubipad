@@ -1219,6 +1219,75 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
+/* --- Enlaces a repositorios/archivos de GitHub que ya están abiertos en la app --- */
+// https://github.com/usuario/repo                  -> abre el archivo "home" de ese repo
+// https://github.com/usuario/repo/blob/rama/ruta   -> abre ese archivo
+// Solo se interceptan repos que están abiertos en la app; el resto se abre en el navegador como siempre.
+function bpParseGhUrl(url) {
+  let m = String(url || "").match(/^https?:\/\/(?:www\.)?github\.com\/([^\/?#\s]+)\/([^\/?#\s]+?)(?:\.git)?(?:\/(?:blob|tree)\/([^?#]*))?\/?(?:[?#].*)?$/i);
+  if (!m) return null;
+  return { owner: m[1], repo: m[2], rest: m[3] ? decodeURIComponent(m[3]) : "" };
+}
+
+function bpGhFindOpenRepo(owner, repo) {
+  let o = owner.toLowerCase(), r = repo.toLowerCase();
+  return (bpGhRepoList || []).find(x => x.owner.toLowerCase() === o && x.repo.toLowerCase() === r) || null;
+}
+
+function bpGhLinkInApp(url) {
+  let u = bpParseGhUrl(url);
+  return !!(u && bpGhFindOpenRepo(u.owner, u.repo));
+}
+
+async function bpOpenGhLinkInApp(url) {
+  let u = bpParseGhUrl(url);
+  let info = u && bpGhFindOpenRepo(u.owner, u.repo);
+  if (!info) throw new Error("Ese repositorio no está abierto en la app.");
+  let owner = info.owner, repo = info.repo, branch = info.branch;
+  let path = null;
+  if (u.rest) {
+    // rest = "<rama>/<ruta>"; se usa la rama con la que está abierto el repo
+    if (u.rest === branch || u.rest.startsWith(branch + "/")) path = u.rest.slice(branch.length + 1);
+    else { let i = u.rest.indexOf("/"); path = i === -1 ? "" : u.rest.slice(i + 1); }
+  }
+  // Mostrar el repo en el explorador (carga perezosa) sin tocar nada más
+  try {
+    if (wr && wr.children) {
+      let node = wr.children.find(n => n.handle && n.handle.repo === repo && n.handle.owner === owner);
+      if (node) { if (node.children === null) await bpGhLoadRepoNode(node); node.expanded = true; rp(); }
+    }
+  } catch (e) { console.error(e); }
+  if (!path) {
+    // Sin ruta: archivo "home" más cercano a la raíz (misma regla que al abrir el repo)
+    let res = await bpGhApi(`/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`);
+    let best = null;
+    for (let e of (res.tree || [])) {
+      if (e.type !== "blob") continue;
+      let parts = e.path.split("/");
+      if (parts.some(x => x.startsWith("."))) continue;
+      let name = parts[parts.length - 1];
+      if (!bpLooksLikeTextFile(name) || !name.toLowerCase().includes("home")) continue;
+      if (!best || parts.length < best.depth) best = { path: e.path, depth: parts.length };
+    }
+    if (!best) throw new Error(`"${repo}" no tiene ningún archivo "home" (pulsa en el explorador para elegir una nota).`);
+    path = best.path;
+  }
+  let handle = { __gh: true, owner, repo, branch, path, sha: null };
+  await bpGhOpenFile({ name: path.split("/").pop() || path, handle });
+}
+
+// Clic en la vista previa (fase de captura: se adelanta al enlace normal de target=_blank)
+Iu.addEventListener("click", e => {
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;   // Ctrl/Cmd+clic = navegador
+  let a = e.target.closest && e.target.closest("a[href]");
+  if (!a || a.classList.contains("internal-link")) return;
+  let href = a.getAttribute("href");
+  if (!bpGhLinkInApp(href)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  bpOpenGhLinkInApp(href).catch(err => xo(`\u26A0 ${err.message}`));
+}, true);
+
 async function bpGhTryRestore() {
   try {
     let st = await bpGhStorageGet(["gh_token", "gh_owner", "gh_repo", "gh_branch", "gh_active", "gh_repos", "gh_auto", "gh_last_repo"]);
@@ -2432,7 +2501,7 @@ function bpParseLinks(line) {
 }
 
 async function bpFollowLink(link) {
-  if (link.kind === "web") { window.open(link.target, "_blank", "noopener,noreferrer"); return; }
+  if (link.kind === "web") { if (bpGhLinkInApp(link.target)) { await bpOpenGhLinkInApp(link.target); return; } window.open(link.target, "_blank", "noopener,noreferrer"); return; }
   const { path, anchor } = bpSplitAnchor(link.target);
   if (link.kind === "wiki") {
     if (path === "") bpScrollToHeading(anchor); else { await bpOpenWikilink(path); bpScrollToHeading(anchor); }
