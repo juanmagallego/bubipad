@@ -1,4 +1,4 @@
-const CACHE_NAME = "bubipad-shell-v8";
+const CACHE_NAME = "bubipad-shell-v9";
 
 // Recursos grandes y estables: se sirven desde caché (rápido) y se
 // actualizan en segundo plano. Todo lo demás (el código de la app) se
@@ -86,7 +86,7 @@ self.addEventListener("fetch", (event) => {
 
   // Código de la app: red primero, caché como respaldo sin conexión.
   event.respondWith(
-    fetch(req)
+    fetch(req, { cache: "no-cache" })
       .then((res) => {
         if (res && res.status === 200 && res.type === "basic") {
           const copy = res.clone();
