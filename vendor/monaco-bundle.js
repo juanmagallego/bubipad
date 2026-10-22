@@ -1236,13 +1236,23 @@ function bpGhFindOpenRepo(owner, repo) {
 
 function bpGhLinkInApp(url) {
   let u = bpParseGhUrl(url);
-  return !!(u && bpGhFindOpenRepo(u.owner, u.repo));
+  if (!u) return false;
+  if (bpGhFindOpenRepo(u.owner, u.repo)) return true;
+  // Repo de la misma cuenta que los abiertos, aunque ahora no esté cargado: se intenta abrir con el token
+  return !!(bpGhToken && (bpGhRepoList || []).some(x => x.owner.toLowerCase() === u.owner.toLowerCase()));
 }
 
 async function bpOpenGhLinkInApp(url) {
   let u = bpParseGhUrl(url);
-  let info = u && bpGhFindOpenRepo(u.owner, u.repo);
-  if (!info) throw new Error("Ese repositorio no está abierto en la app.");
+  if (!u) throw new Error("Enlace de GitHub no reconocido.");
+  let info = bpGhFindOpenRepo(u.owner, u.repo);
+  if (!info) {
+    let ri;
+    try { ri = await bpGhApi(`/repos/${u.owner}/${u.repo}`); }
+    catch (e) { throw new Error(`No se pudo abrir "${u.repo}" con tu token (${e.message.replace(/^GitHub: /, "")}). Mant\u00e9n pulsado el enlace para abrirlo en el navegador.`); }
+    info = { owner: ri.owner.login, repo: ri.name, branch: ri.default_branch };
+    await bpGhOpenRepos([...(bpGhRepoList || []), info], false);   // lo a\u00f1ade al explorador (hasta reiniciar)
+  }
   let owner = info.owner, repo = info.repo, branch = info.branch;
   let path = null;
   if (u.rest) {
@@ -1285,6 +1295,7 @@ Iu.addEventListener("click", e => {
   if (!bpGhLinkInApp(href)) return;
   e.preventDefault();
   e.stopPropagation();
+  xo(`Abriendo ${bpParseGhUrl(href).repo}\u2026`);
   bpOpenGhLinkInApp(href).catch(err => xo(`\u26A0 ${err.message}`));
 }, true);
 
