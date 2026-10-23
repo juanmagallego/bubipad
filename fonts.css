@@ -1,22 +1,24 @@
 /* ============================================================
    fonts.css — Tipografía monoespaciada de BubiPad
    ============================================================
-   Para cambiar la fuente de TODA la app (modo texto, editor
-   Monaco y bloques de código de la vista previa), cambia solo
-   el valor de --app-mono-font aquí abajo. Tiene que coincidir
-   exactamente con el nombre usado en uno de los bloques
-   @font-face de este mismo archivo.
+   La fuente de TODA la app (modo texto, editor Monaco y bloques
+   de código de la vista previa) se cambia con el botón «Aa» de la
+   barra de herramientas, que va alternando las fuentes de la lista
+   BP_FONTS de font-init.js. La elegida se recuerda entre sesiones.
+   --app-mono-font de aquí abajo es solo la fuente por defecto.
 
    Fuentes disponibles ahora mismo:
      "Courier Prime"   (la de siempre)
      "Roboto Mono"     (alternativa, misma licencia)
+     "Nanotype Mono"   (regular, negrita, cursiva y negrita cursiva)
 
    Para añadir una fuente nueva:
      1. Consigue los .woff2 (normal 400, negrita 700, cursiva
         400 italic) y ponlos en /fonts.
      2. Copia uno de los bloques @font-face de abajo y cambia
         el nombre de familia y las rutas a los nuevos archivos.
-     3. Cambia --app-mono-font al nuevo nombre.
+     3. Añade el nombre a la lista BP_FONTS de font-init.js
+        (el botón «Aa» la recorre en ese orden).
      4. Añade las rutas de los nuevos .woff2 a APP_SHELL en
         sw.js, y sube la versión de CACHE_NAME para que se
         actualice en los dispositivos ya instalados.
@@ -69,6 +71,36 @@
   font-family: "Roboto Mono";
   src: url("fonts/roboto-mono-latin-400-italic.woff2") format("woff2");
   font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ---- Nanotype Mono ---- */
+@font-face {
+  font-family: "Nanotype Mono";
+  src: url("fonts/nanotype-mono-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Nanotype Mono";
+  src: url("fonts/nanotype-mono-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Nanotype Mono";
+  src: url("fonts/nanotype-mono-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Nanotype Mono";
+  src: url("fonts/nanotype-mono-700-italic.woff2") format("woff2");
+  font-weight: 700;
   font-style: italic;
   font-display: swap;
 }
