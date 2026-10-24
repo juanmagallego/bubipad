@@ -5,12 +5,12 @@
    de código de la vista previa) se cambia con el botón «Aa» de la
    barra de herramientas, que va alternando las fuentes de la lista
    BP_FONTS de font-init.js. La elegida se recuerda entre sesiones.
-   --app-mono-font de aquí abajo es solo la fuente por defecto.
+   --app-mono-font de aquí abajo es la fuente por defecto (la primera de BP_FONTS).
 
    Fuentes disponibles ahora mismo:
-     "Courier Prime"   (la de siempre)
-     "Roboto Mono"     (alternativa, misma licencia)
-     "Nanotype Mono"   (regular, negrita, cursiva y negrita cursiva)
+     "Nanotype Mono"   (por defecto; regular, negrita, cursiva y negrita cursiva)
+     "Courier Prime"   (la de antes)
+     "Source Serif 4"  (serif proporcional, no monoespaciada)
 
    Para añadir una fuente nueva:
      1. Consigue los .woff2 (normal 400, negrita 700, cursiva
@@ -25,7 +25,7 @@
    ============================================================ */
 
 :root {
-  --app-mono-font: "Courier Prime";
+  --app-mono-font: "Nanotype Mono";
   --app-mono-fallback: Consolas, "Courier New", monospace;
 }
 
@@ -52,28 +52,6 @@
   font-display: swap;
 }
 
-/* ---- Roboto Mono (SIL Open Font License 1.1) ---- */
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/roboto-mono-latin-400-normal.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/roboto-mono-latin-700-normal.woff2") format("woff2");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Roboto Mono";
-  src: url("fonts/roboto-mono-latin-400-italic.woff2") format("woff2");
-  font-weight: 400;
-  font-style: italic;
-  font-display: swap;
-}
 
 /* ---- Nanotype Mono ---- */
 @font-face {
@@ -100,6 +78,36 @@
 @font-face {
   font-family: "Nanotype Mono";
   src: url("fonts/nanotype-mono-700-italic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ---- Source Serif 4 (SIL Open Font License 1.1) ---- */
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-latin-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("fonts/source-serif-4-latin-700-italic.woff2") format("woff2");
   font-weight: 700;
   font-style: italic;
   font-display: swap;

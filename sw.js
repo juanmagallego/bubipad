@@ -1,4 +1,4 @@
-const CACHE_NAME = "bubipad-shell-v10";
+const CACHE_NAME = "bubipad-shell-v12";
 
 // Recursos grandes y estables: se sirven desde caché (rápido) y se
 // actualizan en segundo plano. Todo lo demás (el código de la app) se
@@ -26,10 +26,11 @@ const APP_SHELL = [
   "./fonts/courier-prime-latin-400-normal.woff2",
   "./fonts/courier-prime-latin-400-italic.woff2",
   "./fonts/courier-prime-latin-700-normal.woff2",
-  "./fonts/roboto-mono-latin-400-normal.woff2",
-  "./fonts/roboto-mono-latin-400-italic.woff2",
-  "./fonts/roboto-mono-latin-700-normal.woff2",
   "./fonts/nanotype-mono-400-normal.woff2",
+  "./fonts/source-serif-4-latin-400-normal.woff2",
+  "./fonts/source-serif-4-latin-400-italic.woff2",
+  "./fonts/source-serif-4-latin-700-normal.woff2",
+  "./fonts/source-serif-4-latin-700-italic.woff2",
   "./fonts/nanotype-mono-400-italic.woff2",
   "./fonts/nanotype-mono-700-normal.woff2",
   "./fonts/nanotype-mono-700-italic.woff2",

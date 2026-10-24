@@ -4,7 +4,7 @@
 // Cada nombre tiene que coincidir con un bloque @font-face de fonts.css.
 // El primero es la fuente por defecto.
 (function () {
-  window.BP_FONTS = ["Courier Prime", "Roboto Mono", "Nanotype Mono"];
+  window.BP_FONTS = ["Nanotype Mono", "Courier Prime", "Source Serif 4"];
   try {
     var raw = localStorage.getItem("bp_notepad_mono_font");
     var name = raw ? JSON.parse(raw) : null;
