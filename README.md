@@ -35,7 +35,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+B` / `Ctrl+I` (o `Alt+I`) — Negrita / cursiva · `Ctrl+K` — Insertar enlace (usa el portapapeles como URL)
 - `Alt+E` o `:` — Selector de emojis
 - `Ctrl+U` — minúsculas → MAYÚSCULAS → Título → minúsculas (sobre la selección o la palabra bajo el cursor)
-- `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Alt+L` — Seleccionar línea
+- `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Alt+Shift+L` — Seleccionar línea · `Alt+L` — Corrector: ninguno → euskera → español
 - `Ctrl+↑` / `Ctrl+↓` — Inicio / final del archivo (en macOS, `Cmd+↑/↓`)
 - `Alt+↑` / `Alt+↓` o `Ctrl+Shift+↑` / `Ctrl+Shift+↓` — Mover línea · `Alt+Shift+↑` / `Alt+Shift+↓` — Duplicar línea
 - `Alt+X` — Unicode ↔ carácter

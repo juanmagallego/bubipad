@@ -50,7 +50,7 @@ html, body {
 #toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
   align-items: center;
   padding: 6px 8px;
   background: var(--toolbar-bg);
@@ -61,13 +61,11 @@ html, body {
   display: none;
 }
 
+/* Los grupos no cuentan como cajas: todos los botones fluyen como una sola
+   serie y, si hay que partirla en varias líneas, se rellenan de forma
+   continua, sin huecos ni saltos entre grupos. */
 .group {
-  display: flex;
-  gap: 4px;
-}
-
-.group.right {
-  align-items: center;
+  display: contents;
 }
 
 button {
@@ -706,8 +704,18 @@ the editor instead of pushing it, so Monaco never has to relayout. */
   text-overflow: ellipsis;
 }
 
-.outline-item:hover {
+.outline-item:hover,
+.outline-item:focus {
   background: var(--btn-bg-hover);
+}
+
+.outline-item:focus {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+#outline-popup:focus {
+  outline: none;
 }
 
 .outline-empty {
@@ -866,6 +874,11 @@ the editor instead of pushing it, so Monaco never has to relayout. */
 
   #toolbar::-webkit-scrollbar {
     display: none;
+  }
+
+  .group {
+    display: flex;
+    gap: 4px;
   }
 
   .group,
