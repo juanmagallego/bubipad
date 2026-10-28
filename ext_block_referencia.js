@@ -413,19 +413,19 @@ function bpHelpHTML() {
       ["Backspace (vista previa)", "Atr\u00e1s en el historial"]]) +
     sec("Vista", [
       [c + "+E", "Vista previa \u2194 edici\u00f3n (tambi\u00e9n el chip \u25A0/\u25A1 de la barra de estado)"],
-      [c + "+L", "Tema claro / oscuro"], ["Alt+= / Alt+\u2212", "Zoom + / \u2212"], ["e (vista previa)", "Editar"]]) +
+      ["Ctrl+R, l", "Tema claro / oscuro"], ["Alt+= / Alt+\u2212", "Zoom + / \u2212"], ["e (vista previa)", "Editar"]]) +
     sec("Edici\u00f3n", [
       [c + "+B", "Negrita"], [c + "+I / Alt+I", "Cursiva"], [c + "+K", "Insertar enlace (usa el portapapeles)"],
       ["Alt+E o \u00ab:\u00bb", "Selector de emojis"], [c + "+U", "min\u00fasculas \u2192 MAY\u00daSCULAS \u2192 T\u00edtulo"],
       [c + "+J", "Unir l\u00edneas"], [c + "+D / " + c + "+Shift+K", "Eliminar l\u00ednea"],
-      ["Alt+L", "Seleccionar l\u00ednea"], [c + "+\u2191 / " + c + "+\u2193", "Inicio / final del archivo"],
+      [c + "+L", "Seleccionar l\u00ednea"], [c + "+\u2191 / " + c + "+\u2193", "Inicio / final del archivo"],
       ["Alt+\u2191/\u2193 o " + c + "+Shift+\u2191/\u2193", "Mover l\u00ednea"], ["Alt+May\u00fas+\u2191/\u2193", "Duplicar l\u00ednea"],
       ["Alt+X", "Unicode \u2194 car\u00e1cter"], [c + "+F / " + c + "+H", "Buscar / reemplazar"], ["F3 / May\u00fas+F3", "Resultado siguiente / anterior"],
       ["F1 o " + c + "+Shift+P", "Paleta de comandos"]]) +
     sec("Corrector ortogr\u00e1fico", [
-      ["F6", "Alternar espa\u00f1ol \u2194 euskera"], ["F7 / May\u00fas+F7", "Error siguiente / anterior"],
+      ["Alt+L / F6", "Idioma: espa\u00f1ol \u2192 euskera \u2192 ninguno"], ["Ctrl+R, z", "Activar / desactivar el corrector"], ["F7 / May\u00fas+F7", "Error siguiente / anterior"],
       ["F8 o Alt+Intro", "Sugerencias, a\u00f1adir al diccionario o ignorar"]]) +
-    sec("Tecla l\u00edder: " + c + "+. (o F2) y luego una letra", [
+    sec("Tecla l\u00edder: Ctrl+R (o " + c + "+. o F2) y luego una letra", [
       ["s a n o b", "guardar \u00b7 guardar como \u00b7 nueva \u00b7 carpeta \u00b7 archivo del ordenador"],
       ["p h g x q", "buscar archivo \u00b7 home \u00b7 GitHub \u00b7 cerrar carpeta \u00b7 cerrar pesta\u00f1a"],
       ["f r k m u", "buscar \u00b7 reemplazar \u00b7 enlace \u00b7 esquema \u00b7 lista de enlaces"],
@@ -467,6 +467,7 @@ bpLeaderActions.arrowup = () => bpMoveLine(-1);
 bpLeaderActions.arrowdown = () => bpMoveLine(1);
 bpLeaderActions["?"] = () => bpToggleHelp();
 bpLeaderActions.w = () => bpApplyCaseCycle();
+bpLeaderActions.z = () => { const cur = p2(); return bpToggleDict(cur || "es_ES"); };
 
 /* --- Manejador \u00fanico de atajos (fase de captura) ----------------------- */
 
@@ -529,6 +530,7 @@ function bpKeyHandler(e) {
       if (k === "t") { done(bpToggleOutlinePopup); return; }
       if (k === "PageUp" || k === "PageDown") { done(() => bpCycleTab(k === "PageUp" ? -1 : 1)); return; }
       if (editTarget) {
+        if (k === "l") { done(bpSelectLine); return; }
         if (k === "u") { done(bpApplyCaseCycle); return; }
         if (k === "d") { done(bpDeleteLine); return; }
         if (!bpIsMac && (k === "ArrowUp" || k === "ArrowDown")) { done(() => bpDocEdge(k === "ArrowDown")); return; }
@@ -560,7 +562,7 @@ function bpKeyHandler(e) {
       if (code === "KeyR") { done(bpGhTogglePopup); return; }
       if (code === "KeyE") { done(bpEmojiPicker); return; }
       if (code === "KeyI") { done(bpItalic); return; }
-      if (code === "KeyL" && editTarget) { done(bpSelectLine); return; }
+      if (code === "KeyL") { done(bpLeaderToggleLang); return; }
       if (code === "Enter") { done(bpSpellSuggest); return; }
       const dm = /^(?:Digit|Numpad)([1-9])$/.exec(code);
       if (dm) { done(() => bpGotoNthTab(+dm[1])); return; }

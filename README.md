@@ -26,7 +26,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 ### Vista
 
 - `Ctrl+E` — Alternar vista previa ↔ edición (vuelve al último modo de edición usado: Monaco o texto). También con el chip ■/□ de la barra de estado (■ amarillo = vista previa, □ = edición) y con los iconos del editor y del ojo de la barra de herramientas cuando ya están activos
-- `Ctrl+L` — Tema claro/oscuro
+- `Ctrl+R` y luego `l` — Tema claro/oscuro
 - `Alt+=` / `Alt+−` — Aumentar / reducir el zoom (también `Ctrl+Shift+G` para aumentar)
 - `e` en la vista previa — Editar
 
@@ -35,7 +35,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+B` / `Ctrl+I` (o `Alt+I`) — Negrita / cursiva · `Ctrl+K` — Insertar enlace (usa el portapapeles como URL)
 - `Alt+E` o `:` — Selector de emojis
 - `Ctrl+U` — minúsculas → MAYÚSCULAS → Título → minúsculas (sobre la selección o la palabra bajo el cursor)
-- `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Alt+Shift+L` — Seleccionar línea · `Alt+L` — Corrector: ninguno → euskera → español
+- `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Ctrl+L` — Seleccionar línea
 - `Ctrl+↑` / `Ctrl+↓` — Inicio / final del archivo (en macOS, `Cmd+↑/↓`)
 - `Alt+↑` / `Alt+↓` o `Ctrl+Shift+↑` / `Ctrl+Shift+↓` — Mover línea · `Alt+Shift+↑` / `Alt+Shift+↓` — Duplicar línea
 - `Alt+X` — Unicode ↔ carácter
@@ -45,11 +45,12 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 
 ### Corrector ortográfico
 
-- `F6` — Alternar español ↔ euskera
+- `Alt+L` (o `F6`) — Idioma: español → euskera → ninguno. La app arranca sin corrector y el idioma elegido se mantiene durante la sesión
+- `Ctrl+R` y luego `z` — Activar/desactivar el corrector
 - `F7` / `Shift+F7` — Error siguiente / anterior
 - `F8` o `Alt+Intro` — Sugerencias para el error bajo el cursor, con opciones para añadir la palabra al diccionario (se guarda en el navegador) o ignorarla en la sesión
 
-### Tecla líder: `Ctrl+.` (o `F2`), luego una letra
+### Tecla líder: `Ctrl+R` (o `Ctrl+.`, o `F2`), luego una letra
 
 Al pulsarla aparece un aviso en la barra de estado esperando la siguiente tecla (4 segundos de margen, o `Escape` para cancelar):
 
@@ -58,7 +59,7 @@ Al pulsarla aparece un aviso en la barra de estado esperando la siguiente tecla 
 - `f` buscar · `r` reemplazar · `k` insertar enlace · `m` esquema · `u` lista de enlaces de la nota
 - `e` editor · `v` vista previa · `t` texto plano
 - `d` eliminar línea · `j` unir líneas · `w` minúsculas/MAYÚSCULAS/Título · `c` paleta de comandos
-- `l` tema · `i` idioma del corrector · `+` / `-` zoom
+- `l` tema · `i` idioma del corrector · `z` corrector sí/no · `+` / `-` zoom
 - `←` / `→` historial · `↑` / `↓` mover línea · `Tab` / `Shift+Tab` pestaña siguiente / anterior · `?` ayuda
 
 ### Cambios respecto a versiones anteriores
