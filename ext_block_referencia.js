@@ -27,7 +27,7 @@ function bpUpdateCycleBtn(preview) {                       // botón de la barra
   b.disabled = !sp();
   b.classList.toggle("active", preview);
   b.innerHTML = preview ? BP_ICON_PENCIL : BP_ICON_EYE;    // el icono es la acción que hará el clic
-  b.title = preview ? "Vista previa: clic para editar el texto (Ctrl+E)" : "Edición: clic para ver la vista previa (Ctrl+E)";
+  b.title = preview ? "Vista previa: clic para editar en Mónaco (Ctrl+E)" : "Edición: clic para ver la vista previa (Ctrl+E)";
 }
 
 function bpUpdateModeChip() {
@@ -434,7 +434,7 @@ function bpHelpHTML() {
       ["Alt+1 … Alt+8 / Alt+9", "Ir a esa pestaña / a la última"], ["Alt+Mayús+← / →", "Atrás / adelante en el historial"],
       ["Backspace (vista previa)", "Atrás en el historial"]]) +
     sec("Vista", [
-      [c + "+E", "Vista previa ↔ texto plano (también el chip ■/□ de la barra de estado)"],
+      [c + "+E", "Vista previa ↔ Mónaco (también el botón del toolbar y el chip ■/□ de la barra de estado)"],
       ["Ctrl+R, l", "Tema claro / oscuro"], ["Alt+= / Alt+−", "Zoom + / −"], ["e (vista previa)", "Editar"]]) +
     sec("Edición", [
       [c + "+B", "Negrita"], [c + "+I / Alt+I", "Cursiva"], [c + "+K", "Insertar enlace (usa el portapapeles)"],
@@ -446,7 +446,7 @@ function bpHelpHTML() {
       ["F1 o " + c + "+Shift+P", "Paleta de comandos"],
       [c + "+C / " + c + "+X / " + c + "+V", "Copiar / cortar / pegar (también en Editar)"]]) +
     sec("Corrector ortográfico", [
-      ["Alt+L / F6 / botón ES·EU·--", "Idioma: español → euskera → ninguno"], ["Ctrl+R, z", "Activar / desactivar el corrector"], ["F7 / Mayús+F7", "Error siguiente / anterior"],
+      ["Alt+L / F6", "Idioma: español → euskera → ninguno (en el menú EU/ES; los botones ES y EU fijan cada idioma)"], ["Ctrl+R, z", "Activar / desactivar el corrector"], ["F7 / Mayús+F7", "Error siguiente / anterior"],
       ["F8 o Alt+Intro", "Sugerencias, añadir al diccionario o ignorar"]]) +
     sec("Tecla líder: Ctrl+R (o " + c + "+. o F2) y luego una letra", [
       ["s a y o b", "guardar · guardar como · exportar · carpeta · archivo del ordenador"],
@@ -657,7 +657,7 @@ function bpTextReplace(start, end, text) {
 }
 
 function bpEditMode() {                                    // modo al que se vuelve desde la vista previa
-  return "text";                                           // siempre texto plano; Mónaco solo por el menú Ver o si una acción lo necesita
+  return "edit";                                           // siempre Mónaco (el texto plano sigue en el menú Ver y en Ctrl+R t)
 }
 
 // Envuelve la selección (o un texto de ejemplo) con marcas: negrita, cursiva…
@@ -777,7 +777,7 @@ const BP_MENUS = {
     ["Explorador", "Ctrl+P", () => Rae(), { chk: () => !document.getElementById("sidebar").classList.contains("hidden") }],
     ["Esquema del documento", "Ctrl+T", () => bpToggleOutlinePopup()],
     "-",
-    ["Vista previa ↔ texto", "Ctrl+E", () => bpToggleMode()],
+    ["Vista previa ↔ Mónaco", "Ctrl+E", () => bpToggleMode()],
     ["Vista previa", "Ctrl+R v", bpSetMode("preview"), { chk: () => !!sp() && lp === "preview" }],
     ["Editor (Mónaco)", "Ctrl+R m", bpSetMode("edit"), { chk: () => !!sp() && lp === "edit" }],
     ["Texto plano", "Ctrl+R t", bpSetMode("text"), { chk: () => !!sp() && lp === "text" }],

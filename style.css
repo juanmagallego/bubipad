@@ -105,7 +105,8 @@ button.wide {
   user-select: none;
 }
 
-#lang-cycle-btn.active {
+#lang-es-btn.active,
+#lang-eu-btn.active {
   background: var(--accent);
   border-color: var(--accent-hover);
   color: white;
@@ -1299,5 +1300,112 @@ button.menu-title.open {
 
   #menu-dropdown {
     min-width: 230px;
+  }
+}
+
+/* Móvil / pantallas táctiles: menús, listas desplegables y pantalla de inicio más grandes */
+@media (max-width: 640px), (hover: none) and (pointer: coarse) {
+  button.menu-title {
+    height: 42px;
+    padding: 0 14px;
+    font-size: 17px;
+  }
+
+  #menu-dropdown {
+    min-width: 270px;
+    font-size: 17px;
+  }
+
+  .menu-item {
+    padding: 13px 18px 13px 10px;
+    font-size: 17px;
+  }
+
+  .menu-check {
+    width: 20px;
+    font-size: 15px;
+  }
+
+  #file-search-popup {
+    width: min(400px, calc(100vw - 16px));
+    padding: 12px;
+  }
+
+  #file-search-input {
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .file-search-item {
+    padding: 11px 10px;
+  }
+
+  .file-search-item .fs-name {
+    font-size: 16.5px;
+  }
+
+  #outline-popup {
+    width: min(360px, calc(100vw - 16px));
+    padding: 12px;
+  }
+
+  #outline-status-text {
+    font-size: 14.5px;
+    margin-bottom: 10px;
+  }
+
+  .outline-item {
+    font-size: 16.5px;
+    line-height: 1.4;
+    padding: 11px 10px;
+  }
+
+  .outline-empty {
+    font-size: 15px;
+  }
+
+  #bp-list-popup {
+    min-width: 280px;
+    padding: 8px;
+  }
+
+  .bp-list-title {
+    font-size: 13.5px;
+  }
+
+  .bp-list-item {
+    padding: 11px 10px;
+    font-size: 16.5px;
+  }
+
+  .bp-list-num,
+  .bp-list-hint {
+    font-size: 13px;
+  }
+
+  .welcome-link {
+    width: auto;
+    height: auto;
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .welcome-link svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Móvil estrecho: las listas desplegables ocupan el ancho de la pantalla (la posición inline que calcula el JS las sacaría por la derecha) */
+@media (max-width: 640px) {
+  #file-search-popup,
+  #outline-popup,
+  #bp-list-popup {
+    left: 8px !important;
+    right: 8px !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
   }
 }
