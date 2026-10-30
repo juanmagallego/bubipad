@@ -105,13 +105,7 @@ button.wide {
   user-select: none;
 }
 
-#edit-btn.active,
-#preview-btn.active,
-#lang-btn.active,
-#lang-es-btn.active,
-#lang-eu-btn.active,
-#theme-btn.active,
-#sidebar-toggle-btn.active {
+#lang-cycle-btn.active {
   background: var(--accent);
   border-color: var(--accent-hover);
   color: white;
@@ -214,23 +208,6 @@ button.wide {
 
 .tab-close:hover {
   opacity: 1;
-}
-
-.tab-add {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  align-self: center;
-  color: var(--btn-fg);
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.tab-add:hover {
-  background: var(--btn-bg-hover);
 }
 
 /* ---------------------------------------------------------------------- */
@@ -401,14 +378,61 @@ the editor instead of pushing it, so Monaco never has to relayout. */
   padding: 0 20px;
 }
 
-#empty-state p {
+/* Pantalla de inicio: logotipo ASCII y cuatro enlaces (como en la versión de terminal) */
+#welcome-logo,
+#welcome-rule {
   margin: 0;
-  font-size: 13px;
+  color: var(--accent);
+  font-family: Consolas, "Courier New", ui-monospace, monospace;
+  font-weight: 700;
+  font-size: clamp(9px, 3.1vw, 15px);
+  line-height: 1.15;
+  text-align: left;
+  white-space: pre;
+  user-select: none;
 }
 
-#empty-state .empty-hint {
-  font-size: 11px;
-  opacity: 0.7;
+#welcome-rule {
+  line-height: 1;
+}
+
+#welcome-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 18px 0 10px;
+}
+
+#welcome-links .welcome-row {
+  display: flex;
+  gap: 8px;
+}
+
+.welcome-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  flex: 1 1 0;
+  min-width: 130px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-fg);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.welcome-link:hover,
+.welcome-link:focus-visible {
+  background: var(--accent);
+  color: #ffffff;
+  outline: none;
 }
 
 #text-view {
@@ -1146,4 +1170,118 @@ button.mode-chip.preview {
   padding: 0 7px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.18);
+}
+
+/* ---------------------------------------------------------------------- */
+/* Barra de menús (Archivo, Editar, Ver, Ir, GIT, EU/ES, Ayuda)            */
+/* ---------------------------------------------------------------------- */
+
+#menubar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px 6px 0;
+  background: var(--toolbar-bg);
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+
+#menubar::-webkit-scrollbar {
+  display: none;
+}
+
+button.menu-title {
+  width: auto;
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  background: transparent;
+  color: var(--btn-fg);
+  font: inherit;
+  font-size: 13px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+button.menu-title:hover,
+button.menu-title.open {
+  background: var(--btn-bg-hover);
+  color: var(--text-fg);
+}
+
+#menu-dropdown {
+  display: none;
+  position: fixed;
+  z-index: 500;
+  min-width: 250px;
+  max-width: calc(100vw - 12px);
+  overflow-y: auto;
+  padding: 4px 0;
+  background: var(--toolbar-bg);
+  color: var(--text-fg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  font-size: 13px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.menu-item:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.menu-check {
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 12px;
+}
+
+.menu-label {
+  flex: 1;
+}
+
+.menu-key {
+  margin-left: 18px;
+  font-size: 11.5px;
+  opacity: 0.65;
+}
+
+.menu-sep {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--border);
+}
+
+@media (max-width: 640px) {
+  button.menu-title {
+    height: 36px;
+    padding: 0 11px;
+    font-size: 15px;
+  }
+
+  .menu-item {
+    padding: 10px 14px 10px 8px;
+    font-size: 15px;
+  }
+
+  .menu-key {
+    display: none;
+  }
+
+  #menu-dropdown {
+    min-width: 230px;
+  }
 }

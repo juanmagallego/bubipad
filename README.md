@@ -6,7 +6,8 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 
 ### Archivos y navegación
 
-- `Ctrl+N` / `Ctrl+Shift+A` — Nueva nota
+- Nueva nota: ya no se crea desde la web (solo desde la versión de terminal)
+- `Ctrl+R` `y` — Exportar copia: guarda una copia en otro sitio **sin cambiar el destino** del archivo (un archivo de GitHub sigue guardándose en GitHub). Sin File System Access API (Safari/iPad) se descarga el archivo
 - `Ctrl+S` — Guardar · `Ctrl+Shift+S` — Guardar como
 - `Ctrl+O` — Buscar y abrir archivo por nombre
 - `Alt+O` / `Ctrl+Shift+O` — Abrir archivo del ordenador
@@ -25,7 +26,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 
 ### Vista
 
-- `Ctrl+E` — Alternar vista previa ↔ edición (vuelve al último modo de edición usado: Monaco o texto). También con el chip ■/□ de la barra de estado (■ amarillo = vista previa, □ = edición) y con los iconos del editor y del ojo de la barra de herramientas cuando ya están activos
+- `Ctrl+E` — Alternar vista previa ↔ texto plano (siempre vuelve a texto; Mónaco se elige en Ver o `Ctrl+R m`, o se activa solo cuando una acción lo necesita, como buscar). También con el chip ■/□ de la barra de estado (■ amarillo = vista previa, □ = edición) y con los iconos del editor y del ojo de la barra de herramientas cuando ya están activos
 - `Ctrl+R` y luego `l` — Tema claro/oscuro
 - `Alt+=` / `Alt+−` — Aumentar / reducir el zoom (también `Ctrl+Shift+G` para aumentar)
 - `e` en la vista previa — Editar
@@ -54,11 +55,12 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 
 Al pulsarla aparece un aviso en la barra de estado esperando la siguiente tecla (4 segundos de margen, o `Escape` para cancelar):
 
-- `s` guardar · `a` guardar como · `n` nueva nota · `o` abrir carpeta · `b` abrir archivo del ordenador
+- `s` guardar · `a` guardar como · `y` exportar copia · `o` abrir carpeta · `b` abrir archivo del ordenador
 - `p` buscar archivo · `h` home · `g` panel de GitHub · `x` cerrar carpeta/repositorio · `q` cerrar pestaña
-- `f` buscar · `r` reemplazar · `k` insertar enlace · `m` esquema · `u` lista de enlaces de la nota
-- `e` editor · `v` vista previa · `t` texto plano
-- `d` eliminar línea · `j` unir líneas · `w` minúsculas/MAYÚSCULAS/Título · `c` paleta de comandos
+- `f` buscar · `r` reemplazar · `k` insertar enlace · `u` lista de enlaces de la nota (el esquema sigue en `Ctrl+T`)
+- `m` editor (Mónaco) · `v` vista previa · `t` texto plano
+- `e` corrector en euskera · `c` corrector en español (fijan el idioma; para quitarlo, `Alt+L` o `z`)
+- `d` eliminar línea · `j` unir líneas · `w` minúsculas/MAYÚSCULAS/Título (la paleta de comandos sigue en `F1` / `Ctrl+Shift+P`)
 - `l` tema · `i` idioma del corrector · `z` corrector sí/no · `+` / `-` zoom
 - `←` / `→` historial · `↑` / `↓` mover línea · `Tab` / `Shift+Tab` pestaña siguiente / anterior · `?` ayuda
 
@@ -136,3 +138,8 @@ En navegadores de escritorio compatibles con la File System Access API
 de idioma sigue funcionando igual que antes, como opción adicional para
 diccionarios propios sin tener que republicar la app. En iOS ese botón se
 oculta automáticamente porque el navegador no soporta esa API.
+
+
+## Menús y botones
+
+La barra superior tiene los menús **Archivo, Editar, Ver, Ir, GIT, EU/ES y Ayuda**; todas las funciones están en ellos. Debajo quedan solo los botones más habituales: abrir GitHub, guardar, buscar archivo, borrar línea, mover línea (↑/↓), esquema del documento, buscar, ES y EU. «Cerrar todas las pestañas» está en Editar. La aplicación se abre siempre en modo texto plano; Monaco y la vista previa se eligen desde Ver. Al abrir no se busca ningún archivo «home»: sin archivos abiertos se muestra el logotipo y cuatro enlaces (Archivo = buscar, Home = siempre en vista previa, GitHub y Salir). Desde la vista previa, los enlaces a otras notas las abren también en vista previa hasta que pases a edición (doble clic, menú Ver o chip ■/□). El menú Editar incluye Copiar, Cortar y Pegar; las operaciones con líneas están en Ir, tras «Ir a la línea». El corrector tiene un solo botón que cicla ES → EU → -- (ninguno). Monaco no resalta corchetes, paréntesis ni otros elementos de código.

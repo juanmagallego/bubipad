@@ -1,4 +1,3 @@
-
 /* ------------------------------------------------------------------ */
 /* Coherencia con la versión de terminal (atajos y mejoras adaptadas)   */
 /* ------------------------------------------------------------------ */
@@ -15,7 +14,7 @@ var bpLastEditMode, bpNavBack, bpNavFwd, bpNavBusy, bpUserWordSet, bpIgnoredWord
 
 function bpToggleMode() {
   if (!sp()) { xo("Ningún archivo abierto"); return; }
-  if (lp === "preview") nB(bpLastEditMode && bpLastEditMode !== "preview" ? bpLastEditMode : "edit");
+  if (lp === "preview") nB(bpEditMode());
   else nB("preview");
 }
 
@@ -24,9 +23,17 @@ function bpUpdateModeChip() {
   if (!chip) return;
   const preview = lp === "preview";
   chip.style.display = sp() ? "inline-flex" : "none";
-  chip.textContent = preview ? "\u25A0" : "\u25A1";            // ■ vista previa · □ edición
+  chip.textContent = preview ? "■" : "□";            // ■ vista previa · □ edición
   chip.classList.toggle("preview", preview);
   chip.setAttribute("aria-pressed", preview ? "true" : "false");
+  const label = document.getElementById("repo-label");
+  if (label) {
+    const t = sp(), h = t && t.handle;
+    const gh = !!(h && h.__gh && h.repo);
+    label.textContent = gh ? h.repo : "";
+    label.title = gh ? `${h.owner}/${h.repo} (${h.branch})` : "";
+    label.style.display = gh ? "inline-block" : "none";
+  }
 }
 document.getElementById("mode-chip")?.addEventListener("click", bpToggleMode);
 bpUpdateModeChip();
@@ -78,13 +85,13 @@ function bpSelectLine() {
   }
 }
 
-function bpDocEdge(end) {                                      // Ctrl+\u2191 / Ctrl+\u2193 (como en la terminal)
+function bpDocEdge(end) {                                      // Ctrl+↑ / Ctrl+↓ (como en la terminal)
   if (lp === "text") { const n = end ? Xtv.value.length : 0; Xtv.setSelectionRange(n, n); Xtv.focus(); }
   else if (lp === "edit") { Nt.trigger("kb", end ? "cursorBottom" : "cursorTop", null); Nt.focus(); }
 }
 
 function bpItalic() {
-  bpNeedMonaco(() => C2("*", "*", "texto en cursiva"));
+  bpWrap("*", "*", "texto en cursiva");
 }
 
 function bpEmojiPicker() {                                     // Alt+E: abre el selector escribiendo ":"
@@ -102,14 +109,14 @@ function bpZoom(dir) {
   xo("Zoom " + Math.round(Cu * 100) + " %");
 }
 
-/* --- Mayúsculas / minúsculas / T\u00edtulo (Ctrl+U), igual que en la terminal --- */
+/* --- Mayúsculas / minúsculas / Título (Ctrl+U), igual que en la terminal --- */
 
 const BP_MINOR = new Set(["a", "al", "con", "de", "del", "e", "el", "en", "la", "las", "lo", "los", "o", "por",
   "para", "sin", "u", "un", "una", "y", "eta", "edo", "ere", "baina", "an", "and", "of", "or", "the", "to", "in", "on"]);
 
 function bpTitleCase(text) {
   let first = true;
-  return text.replace(/[\p{L}\p{M}]+(?:['\u2019][\p{L}\p{M}]+)*/gu, m => {
+  return text.replace(/[\p{L}\p{M}]+(?:['’][\p{L}\p{M}]+)*/gu, m => {
     const w = m.toLowerCase();
     const out = (!first && BP_MINOR.has(w)) ? w : w.charAt(0).toUpperCase() + w.slice(1);
     first = false;
@@ -117,7 +124,7 @@ function bpTitleCase(text) {
   });
 }
 
-// min\u00fasculas \u2192 MAY\u00daSCULAS \u2192 T\u00edtulo \u2192 min\u00fasculas (lo mixto pasa a MAY\u00daSCULAS)
+// minúsculas → MAYÚSCULAS → Título → minúsculas (lo mixto pasa a MAYÚSCULAS)
 function bpCycleCase(text) {
   const cands = { upper: text.toUpperCase(), title: bpTitleCase(text), lower: text.toLowerCase() };
   const order = ["upper", "title", "lower"];
@@ -129,7 +136,7 @@ function bpCycleCase(text) {
   return text;
 }
 
-function bpApplyCaseCycle() {
+function bpApplyCaseCycle(fn = bpCycleCase) {
   if (!sp()) return;
   if (lp === "preview") { xo("Pulsa Ctrl+E para editar"); return; }
   if (lp === "text") {
@@ -142,7 +149,7 @@ function bpApplyCaseCycle() {
       while (e < v.length && isW(v[e])) e++;
       if (s === e) { xo("No hay ninguna palabra bajo el cursor."); return; }
     }
-    const next = bpCycleCase(v.slice(s, e));
+    const next = fn(v.slice(s, e));
     ta.value = v.slice(0, s) + next + v.slice(e);
     if (keepSel) ta.setSelectionRange(s, s + next.length); else ta.setSelectionRange(caret, caret);
     ta.focus(); bpTextToModel();
@@ -152,7 +159,7 @@ function bpApplyCaseCycle() {
   if (!model) return;
   const sel = Nt.getSelection();
   if (sel && !sel.isEmpty()) {
-    const text = model.getValueInRange(sel), next = bpCycleCase(text);
+    const text = model.getValueInRange(sel), next = fn(text);
     if (next === text) return;
     const startOffset = model.getOffsetAt(sel.getStartPosition());
     Nt.executeEdits("case-cycle", [{ range: sel, text: next }]);
@@ -162,13 +169,13 @@ function bpApplyCaseCycle() {
     const pos = Nt.getPosition(), w = pos && model.getWordAtPosition(pos);
     if (!w) { xo("No hay ninguna palabra bajo el cursor."); return; }
     const range = new lb.Range(pos.lineNumber, w.startColumn, pos.lineNumber, w.endColumn);
-    const text = model.getValueInRange(range), next = bpCycleCase(text);
+    const text = model.getValueInRange(range), next = fn(text);
     if (next !== text) { Nt.executeEdits("case-cycle", [{ range, text: next }]); Nt.setPosition(pos); }
   }
   Nt.focus();
 }
 
-/* --- Historial atr\u00e1s / adelante entre pesta\u00f1as (Alt+May\u00fas+\u2190/\u2192) ---------- */
+/* --- Historial atrás / adelante entre pestañas (Alt+Mayús+←/→) ---------- */
 
 function bpHistPush(prevId, newId) {
   if (bpNavBusy || !prevId || prevId === newId) return;
@@ -189,16 +196,16 @@ function bpNavGo(dir) {
       return;
     }
   }
-  xo(dir < 0 ? "No hay nada m\u00e1s atr\u00e1s en el historial" : "No hay nada m\u00e1s adelante en el historial");
+  xo(dir < 0 ? "No hay nada más atrás en el historial" : "No hay nada más adelante en el historial");
 }
 
 function bpGotoNthTab(n) {
   if (!ta.length) return;
   const t = n >= 9 ? ta[ta.length - 1] : ta[n - 1];
-  if (t) Yb(t.id); else xo("No hay pesta\u00f1a " + n);
+  if (t) Yb(t.id); else xo("No hay pestaña " + n);
 }
 
-/* --- Esquema en vista previa: salta al t\u00edtulo sin cambiar de modo ------- */
+/* --- Esquema en vista previa: salta al título sin cambiar de modo ------- */
 
 function bpOutlineScrollPreview(line) {
   const lines = jb().replace(/\r\n?/g, "\n").split("\n");
@@ -212,7 +219,7 @@ function bpOutlineScrollPreview(line) {
   }
 }
 
-/* --- Lista emergente gen\u00e9rica (sugerencias, enlaces\u2026) ---------------------- */
+/* --- Lista emergente genérica (sugerencias, enlaces…) ---------------------- */
 
 var bpListEl = null, bpListState = null;
 
@@ -225,7 +232,7 @@ function bpListPick(i) {
   const st = bpListState;
   if (!st || !st.items[i]) return;
   bpHideList();
-  try { st.items[i].run(); } catch (e) { xo("\u26A0 " + e.message); }
+  try { st.items[i].run(); } catch (e) { xo("⚠ " + e.message); }
 }
 
 function bpListRender() {
@@ -302,7 +309,7 @@ function bpSpellJump(dir) {
   if (!p2()) { xo("Activa el corrector (ES o EU) para buscar errores"); return; }
   bpNeedMonaco(() => {
     const rs = bpSpellRanges();
-    if (!rs.length) { xo("Sin errores ortogr\u00e1ficos"); return; }
+    if (!rs.length) { xo("Sin errores ortográficos"); return; }
     const pos = Nt.getPosition(), cur = bpSpellAt(pos);
     const ref = cur ? { l: cur.startLineNumber, c: cur.startColumn } : { l: pos.lineNumber, c: pos.column };
     const after = r => r.startLineNumber > ref.l || (r.startLineNumber === ref.l && r.startColumn > ref.c);
@@ -310,7 +317,7 @@ function bpSpellJump(dir) {
     const target = dir > 0 ? (rs.find(after) || rs[0]) : ([...rs].reverse().find(before) || rs[rs.length - 1]);
     Nt.setSelection(target);
     Nt.revealRangeInCenter(target);
-    xo("Error ortogr\u00e1fico: \u00ab" + Nt.getModel().getValueInRange(target) + "\u00bb (F8: sugerencias)");
+    xo("Error ortográfico: «" + Nt.getModel().getValueInRange(target) + "» (F8: sugerencias)");
   });
 }
 
@@ -318,7 +325,7 @@ function bpSpellSuggest() {
   if (!p2() || !Ap) { xo("Activa el corrector (ES o EU) para ver sugerencias"); return; }
   bpNeedMonaco(() => {
     const pos = Nt.getPosition(), range = pos && bpSpellAt(pos);
-    if (!range) { xo("No hay error ortogr\u00e1fico bajo el cursor (F7: ir al siguiente)"); return; }
+    if (!range) { xo("No hay error ortográfico bajo el cursor (F7: ir al siguiente)"); return; }
     const word = Nt.getModel().getValueInRange(range);
     let sugg = [];
     try { sugg = Ap.suggest(word).slice(0, 8); } catch (e) {}
@@ -327,24 +334,24 @@ function bpSpellSuggest() {
       run: () => { Nt.executeEdits("spell-fix", [{ range, text: s }]); Nt.focus(); }
     }));
     items.push({
-      label: "A\u00f1adir \u00ab" + word + "\u00bb al diccionario", hint: "guarda",
+      label: "Añadir «" + word + "» al diccionario", hint: "guarda",
       run: () => {
         const w = word.toLowerCase();
         bpUserWordSet.add(w);
         chrome.storage.local.set({ bp_user_words: [...bpUserWordSet] });
         ey.clear(); U0e(); Nt.focus();
-        xo("\u00ab" + word + "\u00bb a\u00f1adida al diccionario");
+        xo("«" + word + "» añadida al diccionario");
       }
     });
     items.push({
-      label: "Ignorar \u00ab" + word + "\u00bb", hint: "esta sesi\u00f3n",
+      label: "Ignorar «" + word + "»", hint: "esta sesión",
       run: () => { bpIgnoredWordSet.add(word.toLowerCase()); ey.clear(); U0e(); Nt.focus(); }
     });
-    bpShowList(sugg.length ? "Sugerencias para \u00ab" + word + "\u00bb" : "Sin sugerencias para \u00ab" + word + "\u00bb", items, true);
+    bpShowList(sugg.length ? "Sugerencias para «" + word + "»" : "Sin sugerencias para «" + word + "»", items, true);
   });
 }
 
-/* --- Enlaces: F4 abre el de la posici\u00f3n del cursor; Ctrl+., u lista los de la nota --- */
+/* --- Enlaces: F4 abre el de la posición del cursor; Ctrl+., u lista los de la nota --- */
 
 const BP_LINK_RE = /\[\[([^\]]+)\]\]|!?\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)|<(https?:\/\/[^>\s]+)>|(https?:\/\/[^\s<>()\]]+)/g;
 
@@ -353,7 +360,7 @@ function bpParseLinks(line) {
   BP_LINK_RE.lastIndex = 0;
   let m;
   while ((m = BP_LINK_RE.exec(line))) {
-    if (m[0].startsWith("![")) continue;                       // las im\u00e1genes no son enlaces de navegaci\u00f3n
+    if (m[0].startsWith("![")) continue;                       // las imágenes no son enlaces de navegación
     const r = { start: m.index, end: m.index + m[0].length };
     if (m[1] !== undefined) { const parts = m[1].split("|"); r.kind = "wiki"; r.target = parts[0].trim(); r.label = (parts[1] || parts[0]).trim(); }
     else if (m[3] !== undefined) { r.kind = /^https?:/i.test(m[3]) ? "web" : "internal"; r.target = m[3]; r.label = m[2] || m[3]; }
@@ -364,7 +371,7 @@ function bpParseLinks(line) {
 }
 
 async function bpFollowLink(link) {
-  if (link.kind === "web") { window.open(link.target, "_blank", "noopener,noreferrer"); return; }
+  if (link.kind === "web") { if (bpGhLinkInApp(link.target)) { await bpOpenGhLinkInApp(link.target); return; } window.open(link.target, "_blank", "noopener,noreferrer"); return; }
   const { path, anchor } = bpSplitAnchor(link.target);
   if (link.kind === "wiki") {
     if (path === "") bpScrollToHeading(anchor); else { await bpOpenWikilink(path); bpScrollToHeading(anchor); }
@@ -379,18 +386,18 @@ function bpOpenLinkAtCursor() {
   if (!pos || !model) return;
   const links = bpParseLinks(model.getLineContent(pos.lineNumber));
   const link = links.find(l => pos.column - 1 >= l.start && pos.column - 1 <= l.end);
-  if (!link) { xo("No hay ning\u00fan enlace bajo el cursor"); return; }
-  bpFollowLink(link).catch(e => xo("\u26A0 " + e.message));
+  if (!link) { xo("No hay ningún enlace bajo el cursor"); return; }
+  bpFollowLink(link).catch(e => xo("⚠ " + e.message));
 }
 
 function bpShowLinksList() {
-  if (!sp()) { xo("Ning\u00fan archivo abierto"); return; }
+  if (!sp()) { xo("Ningún archivo abierto"); return; }
   const links = [];
   jb().replace(/\r\n?/g, "\n").split("\n").forEach(line => links.push(...bpParseLinks(line)));
   if (!links.length) { xo("La nota no tiene enlaces"); return; }
   bpShowList("Enlaces de la nota", links.slice(0, 60).map(l => ({
     label: l.label, hint: l.kind === "web" ? l.target.replace(/^https?:\/\//, "") : l.target,
-    run: () => bpFollowLink(l).catch(e => xo("\u26A0 " + e.message))
+    run: () => bpFollowLink(l).catch(e => xo("⚠ " + e.message))
   })), false);
 }
 
@@ -399,39 +406,42 @@ function bpShowLinksList() {
 function bpHelpHTML() {
   const c = bpIsMac ? "Cmd" : "Ctrl";
   const sec = (title, rows) => `<h3>${title}</h3><table>` + rows.map(([k, d]) => `<tr><td><kbd>${k}</kbd></td><td>${d}</td></tr>`).join("") + "</table>";
-  return `<div class="bp-help-head"><strong>Atajos de teclado</strong><button type="button" id="help-close-btn" aria-label="Cerrar">\u2715</button></div>
-<p class="bp-help-note">${c} equivale a Cmd en macOS. Los mismos atajos que la versi\u00f3n de terminal, salvo los que reserva el navegador (ah\u00ed vale la tecla l\u00edder).</p>` +
-    sec("Archivos y navegaci\u00f3n", [
-      [c + "+N / " + c + "+Shift+A", "Nueva nota"], [c + "+S", "Guardar"], [c + "+Shift+S", "Guardar como"],
+  return `<div class="bp-help-head"><strong>Atajos de teclado</strong><button type="button" id="help-close-btn" aria-label="Cerrar">✕</button></div>
+<p class="bp-help-note">${c} equivale a Cmd en macOS. Los mismos atajos que la versión de terminal, salvo los que reserva el navegador (ahí vale la tecla líder). Todo lo que hay aquí también está en los menús.</p>` +
+    sec("Archivos y navegación", [
+      [c + "+S", "Guardar"], [c + "+Shift+S", "Guardar como (el archivo pasa a guardarse en el destino elegido)"],
+      ["Ctrl+R, y", "Exportar copia: guarda una copia en otro sitio sin cambiar el destino (un archivo de GitHub sigue en GitHub)"],
       [c + "+O", "Buscar archivo por nombre"], ["Alt+O / " + c + "+Shift+O", "Abrir archivo del ordenador"],
-      [c + "+P / F9 / " + c + "+Shift+F", "Mostrar u ocultar el explorador"], ["Alt+H", "Abrir el archivo \u00abhome\u00bb"],
-      [c + "+W / " + c + "+Shift+X", "Cerrar pesta\u00f1a"], [c + "+T / " + c + "+Shift+M", "Esquema del documento"],
+      [c + "+P / F9 / " + c + "+Shift+F", "Mostrar u ocultar el explorador"], ["Alt+H", "Abrir el archivo «home»"],
+      [c + "+W / " + c + "+Shift+X", "Cerrar pestaña"], [c + "+T / " + c + "+Shift+M", "Esquema del documento"],
       ["Alt+R", "Panel de GitHub"], ["F4", "Abrir el enlace bajo el cursor"]]) +
-    sec("Pesta\u00f1as e historial", [
-      ["Alt+PgUp / Alt+PgDn", "Pesta\u00f1a anterior / siguiente"], ["Alt+\u2190 / Alt+\u2192", "Lo mismo (no en macOS)"],
-      ["Alt+1 \u2026 Alt+8 / Alt+9", "Ir a esa pesta\u00f1a / a la \u00faltima"], ["Alt+May\u00fas+\u2190 / \u2192", "Atr\u00e1s / adelante en el historial"],
-      ["Backspace (vista previa)", "Atr\u00e1s en el historial"]]) +
+    sec("Pestañas e historial", [
+      ["Alt+PgUp / Alt+PgDn", "Pestaña anterior / siguiente"], ["Alt+← / Alt+→", "Lo mismo (no en macOS)"],
+      ["Alt+1 … Alt+8 / Alt+9", "Ir a esa pestaña / a la última"], ["Alt+Mayús+← / →", "Atrás / adelante en el historial"],
+      ["Backspace (vista previa)", "Atrás en el historial"]]) +
     sec("Vista", [
-      [c + "+E", "Vista previa \u2194 edici\u00f3n (tambi\u00e9n el chip \u25A0/\u25A1 de la barra de estado)"],
-      ["Ctrl+R, l", "Tema claro / oscuro"], ["Alt+= / Alt+\u2212", "Zoom + / \u2212"], ["e (vista previa)", "Editar"]]) +
-    sec("Edici\u00f3n", [
+      [c + "+E", "Vista previa ↔ texto plano (también el chip ■/□ de la barra de estado)"],
+      ["Ctrl+R, l", "Tema claro / oscuro"], ["Alt+= / Alt+−", "Zoom + / −"], ["e (vista previa)", "Editar"]]) +
+    sec("Edición", [
       [c + "+B", "Negrita"], [c + "+I / Alt+I", "Cursiva"], [c + "+K", "Insertar enlace (usa el portapapeles)"],
-      ["Alt+E o \u00ab:\u00bb", "Selector de emojis"], [c + "+U", "min\u00fasculas \u2192 MAY\u00daSCULAS \u2192 T\u00edtulo"],
-      [c + "+J", "Unir l\u00edneas"], [c + "+D / " + c + "+Shift+K", "Eliminar l\u00ednea"],
-      [c + "+L", "Seleccionar l\u00ednea"], [c + "+\u2191 / " + c + "+\u2193", "Inicio / final del archivo"],
-      ["Alt+\u2191/\u2193 o " + c + "+Shift+\u2191/\u2193", "Mover l\u00ednea"], ["Alt+May\u00fas+\u2191/\u2193", "Duplicar l\u00ednea"],
-      ["Alt+X", "Unicode \u2194 car\u00e1cter"], [c + "+F / " + c + "+H", "Buscar / reemplazar"], ["F3 / May\u00fas+F3", "Resultado siguiente / anterior"],
-      ["F1 o " + c + "+Shift+P", "Paleta de comandos"]]) +
-    sec("Corrector ortogr\u00e1fico", [
-      ["Alt+L / F6", "Idioma: espa\u00f1ol \u2192 euskera \u2192 ninguno"], ["Ctrl+R, z", "Activar / desactivar el corrector"], ["F7 / May\u00fas+F7", "Error siguiente / anterior"],
-      ["F8 o Alt+Intro", "Sugerencias, a\u00f1adir al diccionario o ignorar"]]) +
-    sec("Tecla l\u00edder: Ctrl+R (o " + c + "+. o F2) y luego una letra", [
-      ["s a n o b", "guardar \u00b7 guardar como \u00b7 nueva \u00b7 carpeta \u00b7 archivo del ordenador"],
-      ["p h g x q", "buscar archivo \u00b7 home \u00b7 GitHub \u00b7 cerrar carpeta \u00b7 cerrar pesta\u00f1a"],
-      ["f r k m u", "buscar \u00b7 reemplazar \u00b7 enlace \u00b7 esquema \u00b7 lista de enlaces"],
-      ["e v t", "editor \u00b7 vista previa \u00b7 texto plano"], ["d j w c", "borrar l\u00ednea \u00b7 unir \u00b7 May\u00fas/min\u00fas/T\u00edtulo \u00b7 paleta"],
-      ["l i + \u2212", "tema \u00b7 idioma del corrector \u00b7 zoom"], ["\u2190 \u2192 \u2191 \u2193", "historial \u00b7 mover l\u00ednea"],
-      ["Tab / May\u00fas+Tab", "pesta\u00f1a siguiente / anterior"], ["?", "esta ayuda"]]);
+      ["Alt+E o «:»", "Selector de emojis"], [c + "+U", "minúsculas → MAYÚSCULAS → Título"],
+      [c + "+J", "Unir líneas"], [c + "+D / " + c + "+Shift+K", "Eliminar línea"],
+      [c + "+L", "Seleccionar línea"], [c + "+↑ / " + c + "+↓", "Inicio / final del archivo"],
+      ["Alt+↑/↓ o " + c + "+Shift+↑/↓", "Mover línea"], ["Alt+Mayús+↑/↓", "Duplicar línea"],
+      ["Alt+X", "Unicode ↔ carácter"], [c + "+F / " + c + "+H", "Buscar / reemplazar"], ["F3 / Mayús+F3", "Resultado siguiente / anterior"],
+      ["F1 o " + c + "+Shift+P", "Paleta de comandos"],
+      [c + "+C / " + c + "+X / " + c + "+V", "Copiar / cortar / pegar (también en Editar)"]]) +
+    sec("Corrector ortográfico", [
+      ["Alt+L / F6 / botón ES·EU·--", "Idioma: español → euskera → ninguno"], ["Ctrl+R, z", "Activar / desactivar el corrector"], ["F7 / Mayús+F7", "Error siguiente / anterior"],
+      ["F8 o Alt+Intro", "Sugerencias, añadir al diccionario o ignorar"]]) +
+    sec("Tecla líder: Ctrl+R (o " + c + "+. o F2) y luego una letra", [
+      ["s a y o b", "guardar · guardar como · exportar · carpeta · archivo del ordenador"],
+      ["p h g x q", "buscar archivo · home · GitHub · cerrar carpeta · cerrar pestaña"],
+      ["f r k u", "buscar · reemplazar · enlace · lista de enlaces"],
+      ["m v t", "editor (Mónaco) · vista previa · texto plano"], ["e c", "corrector: euskera · español"],
+      ["d j w", "borrar línea · unir · Mayús/minús/Título"],
+      ["l i + −", "tema · idioma del corrector · zoom"], ["← → ↑ ↓", "historial · mover línea"],
+      ["Tab / Mayús+Tab", "pestaña siguiente / anterior"], ["?", "esta ayuda"]]);
 }
 
 function bpToggleHelp() {
@@ -448,7 +458,7 @@ function bpToggleHelp() {
 }
 document.getElementById("help-btn")?.addEventListener("click", bpToggleHelp);
 
-/* --- Tecla l\u00edder: F2 y nuevas letras ---------------------------------- */
+/* --- Tecla líder: F2 y nuevas letras ---------------------------------- */
 
 function bpLeaderBegin() {
   bpLeaderActive = true;
@@ -469,7 +479,7 @@ bpLeaderActions["?"] = () => bpToggleHelp();
 bpLeaderActions.w = () => bpApplyCaseCycle();
 bpLeaderActions.z = () => { const cur = p2(); return bpToggleDict(cur || "es_ES"); };
 
-/* --- Manejador \u00fanico de atajos (fase de captura) ----------------------- */
+/* --- Manejador único de atajos (fase de captura) ----------------------- */
 
 function bpInEditorTarget(t) {
   return !!(t && ((t.closest && t.closest("#editor")) || t.id === "text-view" || t === document.body || t === document.documentElement));
@@ -481,6 +491,7 @@ function bpIsEditableTarget(t) {
 
 function bpCloseOpenPopups() {
   let closed = false;
+  if (bpMenuIsOpen()) { bpMenuClose(); closed = true; }
   for (const id of ["outline-popup", "github-popup", "lang-popup", "help-popup"]) {
     const el = document.getElementById(id);
     if (el && el.style.display === "block") { el.style.display = "none"; closed = true; }
@@ -511,7 +522,7 @@ function bpKeyHandler(e) {
   const k = key.length === 1 ? key.toLowerCase() : key;
   const editTarget = bpInEditorTarget(e.target);
 
-  // Teclas de funci\u00f3n
+  // Teclas de función
   if (!mod && !alt) {
     if (key === "F2" && !shift) { done(bpLeaderBegin); return; }
     if (key === "F4" && !shift) { done(bpOpenLinkAtCursor); return; }
@@ -524,11 +535,13 @@ function bpKeyHandler(e) {
   // Ctrl / Cmd (sin Alt)
   if (mod && !alt) {
     if (!shift) {
-      if (k === "n") { done(() => { zb("", "Sin t\u00edtulo"); nB("edit"); }); return; }
       if (k === "o") { done(bpToggleFileSearchPopup); return; }
       if (k === "w") { done(bpCloseCurrentTab); return; }
       if (k === "t") { done(bpToggleOutlinePopup); return; }
       if (k === "PageUp" || k === "PageDown") { done(() => bpCycleTab(k === "PageUp" ? -1 : 1)); return; }
+      if (editTarget && lp !== "preview" && (k === "b" || k === "i")) {
+        done(() => k === "b" ? bpWrap("**", "**", "texto en negrita") : bpWrap("*", "*", "texto en cursiva")); return;
+      }
       if (editTarget) {
         if (k === "l") { done(bpSelectLine); return; }
         if (k === "u") { done(bpApplyCaseCycle); return; }
@@ -571,10 +584,415 @@ function bpKeyHandler(e) {
     }
   }
 
-  // Teclas sueltas en la vista previa (solo si no se est\u00e1 escribiendo en un campo)
+  // Teclas sueltas en la vista previa (solo si no se está escribiendo en un campo)
   if (lp === "preview" && !mod && !alt && !bpIsEditableTarget(e.target)) {
     if (key === "Backspace") { done(() => bpNavGo(-1)); return; }
-    if (k === "e" && !shift) { done(() => nB(bpLastEditMode && bpLastEditMode !== "preview" ? bpLastEditMode : "edit")); return; }
+    if (k === "e" && !shift) { done(() => nB(bpEditMode())); return; }
   }
 }
 document.addEventListener("keydown", bpKeyHandler, true);
+
+
+/* ------------------------------------------------------------------ */
+/* Archivo > Exportar copia                                            */
+/* ------------------------------------------------------------------ */
+// Guarda una copia del texto en otro sitio SIN cambiar el destino de la
+// pestaña: un archivo de GitHub sigue guardándose en GitHub (a diferencia de
+// «Guardar como», que reasigna la pestaña al archivo local elegido).
+// Sin File System Access API (Safari/iPad) se descarga como archivo normal.
+async function bpExport() {
+  const t = sp();
+  if (!t) { xo("Ningún archivo abierto"); return; }
+  if (lp === "text") bpTextToModel();
+  const text = t.model.getValue();
+  const name = /\.(md|markdown|txt)$/i.test(t.title) ? t.title : t.title + ".md";
+  try {
+    if (window.showSaveFilePicker) {
+      const fh = await window.showSaveFilePicker({
+        suggestedName: name,
+        types: [{ description: "Texto / Markdown", accept: { "text/plain": [".txt", ".md", ".markdown"] } }]
+      });
+      const w = await fh.createWritable();
+      try { await w.write(text); await w.close(); }
+      catch (e) { try { await w.abort(); } catch (_) {} throw e; }
+      xo("Copia exportada: «" + fh.name + "» (el archivo abierto no cambia)");
+    } else {
+      const url = URL.createObjectURL(new Blob([text], { type: "text/markdown;charset=utf-8" }));
+      const a = document.createElement("a");
+      a.href = url; a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      xo("Copia descargada: «" + name + "»");
+    }
+  } catch (e) {
+    if (e.name !== "AbortError") xo("⚠ " + e.message);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Edición que funciona también en modo texto plano (textarea)         */
+/* ------------------------------------------------------------------ */
+// Reemplaza [start, end) del textarea conservando el deshacer nativo.
+function bpTextReplace(start, end, text) {
+  const ta = Xtv;
+  ta.focus();
+  ta.setSelectionRange(start, end);
+  let ok = false;
+  try { ok = document.execCommand("insertText", false, text); } catch (e) {}
+  if (!ok) { ta.setRangeText(text, start, end, "end"); bpTextToModel(); }
+}
+
+function bpEditMode() {                                    // modo al que se vuelve desde la vista previa
+  return "text";                                           // siempre texto plano; Mónaco solo por el menú Ver o si una acción lo necesita
+}
+
+// Envuelve la selección (o un texto de ejemplo) con marcas: negrita, cursiva…
+function bpWrap(before, after, placeholder) {
+  if (!sp()) { xo("Ningún archivo abierto"); return; }
+  if (lp === "preview") nB(bpEditMode());
+  if (lp === "edit") { requestAnimationFrame(() => { Nt.layout(); Nt.focus(); C2(before, after, placeholder); }); return; }
+  const ta = Xtv, s = ta.selectionStart, e = ta.selectionEnd, inner = ta.value.slice(s, e) || placeholder;
+  bpTextReplace(s, e, before + inner + after);
+  ta.setSelectionRange(s + before.length, s + before.length + inner.length);
+  bpTextToModel();
+}
+
+// Insertar enlace [texto](url) usando el portapapeles como URL
+async function bpInsertLink() {
+  if (!sp()) { xo("Ningún archivo abierto"); return; }
+  if (lp === "preview") nB(bpEditMode());
+  if (lp === "edit") { requestAnimationFrame(() => { Nt.layout(); Nt.focus(); Nae(); }); return; }
+  let clip = "";
+  try { clip = (await navigator.clipboard.readText()).trim(); } catch (e) {}
+  const ta = Xtv, s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s, e);
+  const label = sel || "texto del enlace", url = clip || "https://";
+  bpTextReplace(s, e, "[" + label + "](" + url + ")");
+  if (sel) ta.setSelectionRange(s + label.length + 3, s + label.length + 3 + url.length);
+  else ta.setSelectionRange(s + 1, s + 1 + label.length);
+  bpTextToModel();
+}
+
+function bpJoinLines() {
+  if (!sp()) { xo("Ningún archivo abierto"); return; }
+  if (lp === "preview") { xo("Pulsa Ctrl+E para editar"); return; }
+  if (lp === "edit") { Nt.getAction("editor.action.joinLines")?.run(); Nt.focus(); return; }
+  const ta = Xtv, v = ta.value, s0 = ta.selectionStart, e0 = ta.selectionEnd;
+  const ls = v.lastIndexOf("\n", s0 - 1) + 1;
+  let le = v.indexOf("\n", e0); if (le === -1) le = v.length;
+  if (!v.slice(s0, e0).includes("\n")) {                    // sin selección multilínea: une con la línea siguiente
+    if (le === v.length) { xo("No hay línea siguiente que unir"); return; }
+    const nx = v.indexOf("\n", le + 1);
+    le = nx === -1 ? v.length : nx;
+  }
+  const parts = v.slice(ls, le).split("\n");
+  let out = parts[0];
+  for (const l of parts.slice(1)) {
+    const t = l.replace(/^\s+/, "");
+    if (t) out += (out === "" || /\s$/.test(out) ? "" : " ") + t;
+  }
+  bpTextReplace(ls, le, out);
+  bpTextToModel();
+}
+
+function bpUndoRedo(redo) {
+  if (!sp() || lp === "preview") return;
+  if (lp === "text") { Xtv.focus(); document.execCommand(redo ? "redo" : "undo"); bpTextToModel(); return; }
+  Nt.trigger("toolbar", redo ? "redo" : "undo", null); Nt.focus();
+}
+
+function bpSelectAll() {
+  if (!sp()) return;
+  if (lp === "text") { Xtv.focus(); Xtv.select(); sy(Xtv.value, Xtv.value); }
+  else if (lp === "edit") { Nt.trigger("kb", "selectAll", null); Nt.focus(); }
+  else { const r = document.createRange(); r.selectNodeContents(Iu); const g = window.getSelection(); g.removeAllRanges(); g.addRange(r); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Menús: Archivo · Editar · Ver · Ir · GIT · EU/ES · Ayuda             */
+/* ------------------------------------------------------------------ */
+// Cada entrada: [etiqueta (o función), atajo, acción, {chk: función}] o "-".
+// Las acciones llaman a las mismas funciones que los botones y atajos.
+const bpK = s => bpIsMac ? s.replace(/Ctrl\+/g, "Cmd+") : s;
+const bpNeedTab = fn => () => { if (!sp()) { xo("Ningún archivo abierto"); return; } return fn(); };
+const bpMonacoAction = id => bpNeedTab(() => bpNeedMonaco(() => Nt.getAction(id)?.run()));
+const bpSetMode = m => bpNeedTab(() => nB(m));
+
+const BP_MENUS = {
+  archivo: [
+    ["Abrir archivo del ordenador…", "Alt+O", () => bpOpenFileFromComputer()],
+    ["Abrir carpeta…", "Ctrl+R o", () => document.getElementById("open-folder-btn").click()],
+    ["Buscar archivo…", "Ctrl+O", () => bpToggleFileSearchPopup()],
+    ["Archivo «home»", "Alt+H", () => bpOpenHomeFile()],
+    "-",
+    ["Guardar", "Ctrl+S", () => document.getElementById("save-btn").click()],
+    ["Guardar como…", "Ctrl+Shift+S", () => bpSaveAs()],
+    ["Exportar copia…", "Ctrl+R y", () => bpExport()],
+    "-",
+    ["Cerrar pestaña", "Ctrl+W", () => bpCloseCurrentTab()],
+    [() => (wr && wr.handle && wr.handle.__gh) ? "Cerrar repositorio" : "Cerrar carpeta", "Ctrl+R x", () => bpCloseExplorerRoot()]
+  ],
+  editar: [
+    ["Deshacer", "Ctrl+Z", () => bpUndoRedo(false)],
+    ["Rehacer", "Ctrl+Y", () => bpUndoRedo(true)],
+    "-",
+    ["Copiar", "Ctrl+C", () => bpClipboard("copy")],
+    ["Cortar", "Ctrl+X", () => bpClipboard("cut")],
+    ["Pegar", "Ctrl+V", () => bpClipboard("paste")],
+    "-",
+    ["Buscar…", "Ctrl+F", bpMonacoAction("actions.find")],
+    ["Reemplazar…", "Ctrl+R r", bpMonacoAction("editor.action.startFindReplaceAction")],
+    "-",
+    ["Negrita", "Ctrl+B", () => bpWrap("**", "**", "texto en negrita")],
+    ["Cursiva", "Ctrl+I", () => bpWrap("*", "*", "texto en cursiva")],
+    ["Insertar enlace", "Ctrl+K", () => bpInsertLink()],
+    ["Emoji…", "Alt+E", bpNeedTab(() => bpEmojiPicker())],
+    ["Abrir enlace (web)", "F4", () => bpOpenLinkAtCursor()],
+    "-",
+    ["Seleccionar todo", "Ctrl+A", () => bpSelectAll()],
+    ["Seleccionar línea", "Ctrl+L", () => bpSelectLine()],
+    ["Ir al inicio del archivo", "Ctrl+↑", () => bpDocEdge(false)],
+    ["Ir al final del archivo", "Ctrl+↓", () => bpDocEdge(true)],
+    ["Mayús. / minús. / Título", "Ctrl+U", () => bpApplyCaseCycle()],
+    ["minúsculas", "", () => bpApplyCaseCycle(t => t.toLowerCase())],
+    ["MAYÚSCULAS", "", () => bpApplyCaseCycle(t => t.toUpperCase())],
+    ["Unicode ↔ carácter", "Alt+X", bpNeedTab(() => bpNeedMonaco(() => bpUnicodeToggle()))],
+    "-",
+    ["Cerrar todas las pestañas", "", () => bpCloseAllTabs()]
+  ],
+  ver: [
+    ["Explorador", "Ctrl+P", () => Rae(), { chk: () => !document.getElementById("sidebar").classList.contains("hidden") }],
+    ["Esquema del documento", "Ctrl+T", () => bpToggleOutlinePopup()],
+    "-",
+    ["Vista previa ↔ texto", "Ctrl+E", () => bpToggleMode()],
+    ["Vista previa", "Ctrl+R v", bpSetMode("preview"), { chk: () => !!sp() && lp === "preview" }],
+    ["Editor (Mónaco)", "Ctrl+R m", bpSetMode("edit"), { chk: () => !!sp() && lp === "edit" }],
+    ["Texto plano", "Ctrl+R t", bpSetMode("text"), { chk: () => !!sp() && lp === "text" }],
+    "-",
+    ["Zoom +", "Alt++", () => bpZoom(1)],
+    ["Zoom −", "Alt+−", () => bpZoom(-1)],
+    [() => "Cambiar fuente (" + bpFontList[bpFontIdx] + ")", "", () => bpApplyFont(bpFontIdx + 1, true)],
+    ["Tema claro/oscuro", "Ctrl+R l", () => document.getElementById("theme-btn").click()]
+  ],
+  ir: [
+    ["Pestaña siguiente", "Alt+→", () => bpCycleTab(1)],
+    ["Pestaña anterior", "Alt+←", () => bpCycleTab(-1)],
+    ["Atrás en el historial", "Alt+Shift+←", () => bpNavGo(-1)],
+    ["Adelante en el historial", "Alt+Shift+→", () => bpNavGo(1)],
+    "-",
+    ["Ir a la línea…", "", bpMonacoAction("editor.action.gotoLine")],
+    ["Mover línea ↑", "Alt+↑", () => bpMoveLine(-1)],
+    ["Mover línea ↓", "Alt+↓", () => bpMoveLine(1)],
+    ["Duplicar línea ↑", "Alt+Shift+↑", () => bpDuplicateLine(-1)],
+    ["Duplicar línea ↓", "Alt+Shift+↓", () => bpDuplicateLine(1)],
+    ["Eliminar línea", "Ctrl+D", () => bpDeleteLine()],
+    ["Unir líneas", "Ctrl+J", () => bpJoinLines()],
+    ["Comandos…", "Ctrl+Shift+P", bpMonacoAction("editor.action.quickCommand")]
+  ],
+  git: [
+    ["Abrir repositorio de GitHub…", "Alt+R", () => bpGhTogglePopup()],
+    ["Actualizar repositorio / carpeta", "", () => bpRefreshExplorerRoot()],
+    ["Olvidar credenciales", "", () => bpGhForgetBtn.click()]
+  ],
+  idioma: [
+    ["Activar/desactivar corrector", "Ctrl+R z", () => bpLeaderActions.z()],
+    ["Español (es_ES)", "Ctrl+R c", () => bpSetDict("es_ES"), { chk: () => p2() === "es_ES" }],
+    ["Euskera (eu_ES)", "Ctrl+R e", () => bpSetDict("eu_ES"), { chk: () => p2() === "eu_ES" }],
+    ["Idioma: ES → EU → ninguno", "Alt+L / F6", () => bpLeaderToggleLang()],
+    ["Otro diccionario / carpeta…", "", () => document.getElementById("lang-btn").click()],
+    "-",
+    ["Siguiente error", "F7", () => bpSpellJump(1)],
+    ["Error anterior", "Shift+F7", () => bpSpellJump(-1)],
+    ["Sugerencias…", "F8", () => bpSpellSuggest()]
+  ],
+  ayuda: [
+    ["Atajos de teclado", "", () => bpToggleHelp()]
+  ]
+};
+
+var bpMenuEl = null, bpMenuOpenId = null;
+
+function bpMenuIsOpen() { return !!bpMenuOpenId; }
+
+function bpMenuClose() {
+  bpMenuOpenId = null;
+  if (bpMenuEl) bpMenuEl.style.display = "none";
+  document.querySelectorAll("#menubar .menu-title.open").forEach(b => b.classList.remove("open"));
+}
+
+function bpMenuRun(fn) {
+  try {
+    const r = fn();
+    if (r && typeof r.catch === "function") r.catch(err => { if (err && err.name !== "AbortError") xo("⚠ " + err.message); });
+  } catch (err) { xo("⚠ " + err.message); }
+}
+
+function bpMenuOpen(id, btn) {
+  const items = BP_MENUS[id];
+  if (!items) return;
+  if (!bpMenuEl) {
+    bpMenuEl = document.createElement("div");
+    bpMenuEl.id = "menu-dropdown";
+    bpMenuEl.setAttribute("role", "menu");
+    bpMenuEl.addEventListener("mousedown", ev => ev.preventDefault());     // no quitar el foco ni la selección al editor
+    bpMenuEl.addEventListener("click", ev => {
+      const row = ev.target.closest(".menu-item");
+      if (!row) return;
+      ev.stopPropagation();                                              // que no cierre ventanas que la acción abra
+      const fn = bpMenuEl._actions[+row.dataset.i];
+      bpMenuClose();
+      if (fn) setTimeout(() => bpMenuRun(fn), 0);
+    });
+    document.body.appendChild(bpMenuEl);
+  }
+  bpMenuEl.innerHTML = "";
+  bpMenuEl._actions = [];
+  items.forEach(it => {
+    if (it === "-") { const sep = document.createElement("div"); sep.className = "menu-sep"; bpMenuEl.appendChild(sep); return; }
+    const [label, key, fn, opts] = it;
+    const row = document.createElement("div");
+    row.className = "menu-item"; row.setAttribute("role", "menuitem");
+    row.dataset.i = String(bpMenuEl._actions.length);
+    bpMenuEl._actions.push(fn);
+    const chk = document.createElement("span");
+    chk.className = "menu-check"; chk.textContent = opts && opts.chk && opts.chk() ? "✓" : "";
+    const lab = document.createElement("span");
+    lab.className = "menu-label"; lab.textContent = typeof label === "function" ? label() : label;
+    row.append(chk, lab);
+    if (key) { const k = document.createElement("span"); k.className = "menu-key"; k.textContent = bpK(key); row.appendChild(k); }
+    bpMenuEl.appendChild(row);
+  });
+  document.querySelectorAll("#menubar .menu-title.open").forEach(b => b.classList.remove("open"));
+  btn.classList.add("open");
+  bpMenuOpenId = id;
+  bpMenuEl.style.display = "block";
+  const r = btn.getBoundingClientRect();
+  bpMenuEl.style.maxHeight = Math.max(160, window.innerHeight - r.bottom - 12) + "px";
+  bpMenuEl.style.top = r.bottom + "px";
+  bpMenuEl.style.left = Math.max(6, Math.min(r.left, window.innerWidth - bpMenuEl.offsetWidth - 6)) + "px";
+}
+
+document.querySelectorAll("#menubar .menu-title").forEach(btn => {
+  btn.addEventListener("mousedown", ev => ev.preventDefault());
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.menu;
+    if (bpMenuOpenId === id) bpMenuClose(); else bpMenuOpen(id, btn);
+  });
+  btn.addEventListener("pointerenter", ev => {                           // con un menú abierto, pasar el ratón cambia de menú
+    if (ev.pointerType === "mouse" && bpMenuOpenId && bpMenuOpenId !== btn.dataset.menu) bpMenuOpen(btn.dataset.menu, btn);
+  });
+});
+document.addEventListener("pointerdown", ev => {
+  if (bpMenuOpenId && !(bpMenuEl && bpMenuEl.contains(ev.target)) && !ev.target.closest("#menubar")) bpMenuClose();
+}, true);
+window.addEventListener("resize", bpMenuClose);
+window.addEventListener("blur", bpMenuClose);
+
+/* --- Tecla líder: «y» exporta; «n» (nueva nota) ya no existe en la web --- */
+bpLeaderActions.y = () => bpExport();
+bpLeaderActions.e = () => bpSetDict("eu_ES");          // Ctrl+R e: euskera
+bpLeaderActions.c = () => bpSetDict("es_ES");          // Ctrl+R c: español
+bpLeaderActions.m = () => { if (sp()) nB("edit"); else xo("Ningún archivo abierto"); };   // Ctrl+R m: Mónaco
+bpLeaderActions.k = () => bpInsertLink();
+delete bpLeaderActions.n;
+
+/* ------------------------------------------------------------------ */
+/* Corrector: fijar idioma (Ctrl+R e / Ctrl+R c) y botón único          */
+/* ------------------------------------------------------------------ */
+// Si el idioma ya está activo no se desactiva (para eso están Alt+L, el botón
+// ES/EU/-- y «Activar/desactivar corrector»).
+async function bpSetDict(name) {
+  try {
+    await bpDictIndexReady;
+    if (p2() === name) xo("Corrector: " + (name === "eu_ES" ? "euskera" : "español"));
+    else await bpToggleDict(name);
+  } catch (e) { xo("⚠ " + e.message); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Enlaces desde la vista previa: la pestaña de destino sigue en vista previa */
+/* ------------------------------------------------------------------ */
+// Se usa en los clics sobre enlaces de la vista previa. Si se venía de la vista
+// previa, la nota que se abre se queda en vista previa (hasta pasar a edición
+// con doble clic, el menú Ver o el chip ■/□).
+async function bpKeepPreview(fn) {
+  const wasPreview = lp === "preview";
+  try { return await fn(); }
+  finally { if (wasPreview && sp() && lp !== "preview") nB("preview"); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Editar > Copiar / Cortar / Pegar                                    */
+/* ------------------------------------------------------------------ */
+// Sin selección: Cortar corta la línea; Copiar avisa. En la vista previa solo se
+// puede copiar lo seleccionado. Pegar lee el portapapeles (el navegador puede
+// pedir permiso; si lo niega, vale Ctrl+V).
+async function bpClipboard(op) {
+  if (!sp()) { xo("Ningún archivo abierto"); return; }
+  const done = () => xo(op === "cut" ? "Cortado" : op === "copy" ? "Copiado" : "Pegado");
+  if (lp === "preview") {
+    if (op !== "copy") { xo("Pulsa Ctrl+E para editar"); return; }
+    const sel = String(window.getSelection() || "");
+    if (!sel) { xo("No hay nada seleccionado"); return; }
+    try { await navigator.clipboard.writeText(sel); done(); } catch (err) { xo("⚠ " + err.message); }
+    return;
+  }
+  if (op === "paste") {
+    let text = "";
+    try { text = await navigator.clipboard.readText(); }
+    catch (err) { xo("⚠ El navegador no deja pegar desde el menú: usa " + (bpIsMac ? "Cmd" : "Ctrl") + "+V"); return; }
+    if (!text) { xo("El portapapeles está vacío"); return; }
+    if (lp === "text") { const ta = Xtv; bpTextReplace(ta.selectionStart, ta.selectionEnd, text); bpTextToModel(); }
+    else { const sel = Nt.getSelection(); Nt.executeEdits("paste", [{ range: sel, text, forceMoveMarkers: true }]); Nt.focus(); }
+    done(); return;
+  }
+  let text = "";
+  if (lp === "text") {
+    const ta = Xtv, v = ta.value;
+    let a = ta.selectionStart, b = ta.selectionEnd;
+    if (a === b) {
+      if (op === "copy") { xo("No hay nada seleccionado"); return; }
+      a = v.lastIndexOf("\n", a - 1) + 1;
+      const le = v.indexOf("\n", b); b = le === -1 ? v.length : le + 1;
+    }
+    text = v.slice(a, b);
+    try { await navigator.clipboard.writeText(text); } catch (err) { xo("⚠ " + err.message); return; }
+    if (op === "cut") { bpTextReplace(a, b, ""); bpTextToModel(); }
+    ta.focus();
+  } else {
+    const model = Nt.getModel(); let sel = Nt.getSelection();
+    if (sel.isEmpty()) {
+      if (op === "copy") { xo("No hay nada seleccionado"); return; }
+      const ln = sel.startLineNumber, last = model.getLineCount();
+      if (ln < last) sel = new DF(ln, 1, ln + 1, 1);
+      else if (ln > 1) sel = new DF(ln - 1, model.getLineMaxColumn(ln - 1), ln, model.getLineMaxColumn(ln));
+      else sel = new DF(1, 1, 1, model.getLineMaxColumn(1));
+    }
+    text = model.getValueInRange(sel);
+    try { await navigator.clipboard.writeText(text); } catch (err) { xo("⚠ " + err.message); return; }
+    if (op === "cut") Nt.executeEdits("cut", [{ range: sel, text: "" }]);
+    Nt.focus();
+  }
+  done();
+}
+
+/* ------------------------------------------------------------------ */
+/* Pantalla de inicio (sin archivos abiertos): Archivo · Home · GitHub · Salir */
+/* ------------------------------------------------------------------ */
+function bpQuit() {
+  if (ta.some(t => t.dirty) && !confirm("Hay cambios sin guardar. ¿Salir de todos modos?")) return;
+  window.close();
+  setTimeout(() => xo("El navegador no deja cerrar esta pestaña desde la página: ciérrala con " + (bpIsMac ? "Cmd" : "Ctrl") + "+W."), 300);
+}
+document.getElementById("welcome-search")?.addEventListener("click", () => bpToggleFileSearchPopup());
+document.getElementById("welcome-home")?.addEventListener("click", () => bpOpenHomeFile());
+document.getElementById("welcome-github")?.addEventListener("click", () => bpGhTogglePopup());
+document.getElementById("welcome-quit")?.addEventListener("click", () => bpQuit());
+
+/* --- Monaco sin resaltado de corchetes ------------------------------------ */
+// La coloración de pares de corchetes es una opción del MODELO (la del editor
+// no basta cuando el modelo se crea aparte), así que se desactiva en cada uno.
+const bpNoBrackets = m => {
+  try { m.updateOptions({ bracketColorizationOptions: { enabled: false, independentColorPoolPerBracketType: false } }); } catch (e) {}
+};
+lb.editor.onDidCreateModel(bpNoBrackets);
+lb.editor.getModels().forEach(bpNoBrackets);
