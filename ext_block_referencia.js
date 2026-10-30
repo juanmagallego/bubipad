@@ -18,10 +18,23 @@ function bpToggleMode() {
   else nB("preview");
 }
 
+var BP_ICON_EYE = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8 C3.2 5 5.5 3.6 8 3.6 C10.5 3.6 12.8 5 14.5 8 C12.8 11 10.5 12.4 8 12.4 C5.5 12.4 3.2 11 1.5 8 Z"/><circle cx="8" cy="8" r="2"/></svg>';
+var BP_ICON_PENCIL = '<svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.8 2.7 L13.3 5.2 L5.4 13.1 L2.4 13.6 L2.9 10.6 Z"/><path d="M9.3 4.2 L11.8 6.7"/></svg>';
+
+function bpUpdateCycleBtn(preview) {                       // botón de la barra: vista previa <-> texto
+  const b = document.getElementById("mode-cycle-btn");
+  if (!b || !BP_ICON_EYE) return;      // (puede llamarse antes de que el bloque termine de cargarse)
+  b.disabled = !sp();
+  b.classList.toggle("active", preview);
+  b.innerHTML = preview ? BP_ICON_PENCIL : BP_ICON_EYE;    // el icono es la acción que hará el clic
+  b.title = preview ? "Vista previa: clic para editar el texto (Ctrl+E)" : "Edición: clic para ver la vista previa (Ctrl+E)";
+}
+
 function bpUpdateModeChip() {
   const chip = document.getElementById("mode-chip");
   if (!chip) return;
   const preview = lp === "preview";
+  bpUpdateCycleBtn(preview);
   chip.style.display = sp() ? "inline-flex" : "none";
   chip.textContent = preview ? "■" : "□";            // ■ vista previa · □ edición
   chip.classList.toggle("preview", preview);
@@ -36,6 +49,7 @@ function bpUpdateModeChip() {
   }
 }
 document.getElementById("mode-chip")?.addEventListener("click", bpToggleMode);
+document.getElementById("mode-cycle-btn")?.addEventListener("click", bpToggleMode);
 bpUpdateModeChip();
 
 /* --- Utilidades de edición que funcionan en Monaco y en texto plano ---- */
