@@ -3127,10 +3127,12 @@ function bpQuit() {
   window.close();
   setTimeout(() => xo("El navegador no deja cerrar esta pesta\u00F1a desde la p\u00E1gina: ci\u00E9rrala con " + (bpIsMac ? "Cmd" : "Ctrl") + "+W."), 300);
 }
-document.getElementById("welcome-search")?.addEventListener("click", () => bpToggleFileSearchPopup());
-document.getElementById("welcome-home")?.addEventListener("click", () => bpOpenHomeFile());
-document.getElementById("welcome-github")?.addEventListener("click", () => bpGhTogglePopup());
-document.getElementById("welcome-quit")?.addEventListener("click", () => bpQuit());
+// stopPropagation: los paneles se cierran al hacer clic \u00ABfuera\u00BB de su botón de la barra;
+// sin esto, el clic que los abre desde aquí los cerraría en el mismo instante.
+for (const [id, fn] of [["welcome-search", bpToggleFileSearchPopup], ["welcome-home", bpOpenHomeFile],
+                        ["welcome-github", bpGhTogglePopup], ["welcome-quit", bpQuit]]) {
+  document.getElementById(id)?.addEventListener("click", ev => { ev.stopPropagation(); fn(); });
+}
 
 /* --- Monaco sin resaltado de corchetes ------------------------------------ */
 // La coloraci\u00F3n de pares de corchetes es una opci\u00F3n del MODELO (la del editor

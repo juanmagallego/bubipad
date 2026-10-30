@@ -983,10 +983,12 @@ function bpQuit() {
   window.close();
   setTimeout(() => xo("El navegador no deja cerrar esta pestaña desde la página: ciérrala con " + (bpIsMac ? "Cmd" : "Ctrl") + "+W."), 300);
 }
-document.getElementById("welcome-search")?.addEventListener("click", () => bpToggleFileSearchPopup());
-document.getElementById("welcome-home")?.addEventListener("click", () => bpOpenHomeFile());
-document.getElementById("welcome-github")?.addEventListener("click", () => bpGhTogglePopup());
-document.getElementById("welcome-quit")?.addEventListener("click", () => bpQuit());
+// stopPropagation: los paneles se cierran al hacer clic «fuera» de su botón de la barra;
+// sin esto, el clic que los abre desde aquí los cerraría en el mismo instante.
+for (const [id, fn] of [["welcome-search", bpToggleFileSearchPopup], ["welcome-home", bpOpenHomeFile],
+                        ["welcome-github", bpGhTogglePopup], ["welcome-quit", bpQuit]]) {
+  document.getElementById(id)?.addEventListener("click", ev => { ev.stopPropagation(); fn(); });
+}
 
 /* --- Monaco sin resaltado de corchetes ------------------------------------ */
 // La coloración de pares de corchetes es una opción del MODELO (la del editor
