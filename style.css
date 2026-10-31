@@ -1254,7 +1254,8 @@ button.menu-title.open {
   white-space: nowrap;
 }
 
-.menu-item:hover {
+.menu-item:hover,
+.menu-item.kb-active {
   background: var(--accent);
   color: #fff;
 }

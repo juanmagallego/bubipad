@@ -16,6 +16,8 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+W` / `Ctrl+Shift+X` — Cerrar la pestaña actual
 - `Ctrl+T` / `Ctrl+Shift+M` — Esquema del documento (en vista previa salta al título sin cambiar de modo)
 - `Alt+R` — Panel de GitHub
+- `Esc` — Cierra la ventana o el menú abiertos; si no hay ninguno, abre el primer menú (Archivo). Con un menú abierto: `←`/`→` cambian de menú, `↑`/`↓` (o `Inicio`/`Fin`) se mueven por las opciones, una letra salta a la opción que empieza por ella, `Intro` la ejecuta y `Esc` sale devolviendo el foco al editor. En el editor, `Esc` sigue siendo de Mónaco mientras haya abierto el buscador, las sugerencias o la paleta de comandos
+- Esquema (`Ctrl+T`): el foco queda en el primer título; `↑`/`↓`, `Inicio`/`Fin` para moverse e `Intro` para saltar
 - `F4` — Abrir el enlace bajo el cursor
 
 ### Pestañas e historial

@@ -1816,6 +1816,7 @@ function bpRenderOutline() {
   for (let item of items) {
     let el = document.createElement("div");
     el.className = "outline-item";
+    el.tabIndex = -1;
     el.style.paddingLeft = `${6 + (item.level - 1) * 14}px`;
     el.textContent = item.text;
     el.dataset.line = item.line;
@@ -1830,7 +1831,26 @@ function bpToggleOutlinePopup() {
   bpOutlinePopup.style.left = `${Math.min(rect.left, window.innerWidth - 276)}px`;
   bpRenderOutline();
   bpOutlinePopup.style.display = "block";
+  bpOutlinePopup.tabIndex = -1;
+  const first = bpOutlineList.querySelector(".outline-item");
+  (first || bpOutlinePopup).focus({ preventScroll: true });   // foco en el primer t\u00EDtulo, como \u00ABabrir archivo\u00BB
 }
+
+bpOutlinePopup?.addEventListener("keydown", ev => {
+  if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
+  const rows = Array.from(bpOutlineList.querySelectorAll(".outline-item"));
+  if (!rows.length) return;
+  let i = rows.indexOf(document.activeElement);
+  if (ev.key === "ArrowDown") i = (i + 1) % rows.length;
+  else if (ev.key === "ArrowUp") i = (i - 1 + rows.length) % rows.length;
+  else if (ev.key === "Home") i = 0;
+  else if (ev.key === "End") i = rows.length - 1;
+  else if (ev.key === "Enter" || ev.key === " ") { if (i >= 0) { ev.preventDefault(); rows[i].click(); } return; }
+  else return;
+  ev.preventDefault();
+  rows[i].focus();
+  rows[i].scrollIntoView({ block: "nearest" });
+});
 
 bpOutlineBtn?.addEventListener("click", bpToggleOutlinePopup);
 document.addEventListener("click", o => {
@@ -2671,7 +2691,7 @@ function bpIsEditableTarget(t) {
 function bpCloseOpenPopups() {
   let closed = false;
   if (bpMenuIsOpen()) { bpMenuClose(); closed = true; }
-  for (const id of ["outline-popup", "github-popup", "lang-popup", "help-popup"]) {
+  for (const id of ["outline-popup", "file-search-popup", "github-popup", "lang-popup", "help-popup"]) {
     const el = document.getElementById(id);
     if (el && el.style.display === "block") { el.style.display = "none"; closed = true; }
   }
@@ -2695,7 +2715,23 @@ function bpKeyHandler(e) {
     bpHideList();
   }
 
-  if (key === "Escape") { if (bpCloseOpenPopups()) { e.preventDefault(); e.stopPropagation(); } return; }
+  // Men\u00FA abierto: el teclado lo controla (flechas, Intro, Esc...)
+  if (bpMenuIsOpen() && key !== "Escape" && bpMenuKey(e)) return;
+
+  if (key === "Escape") {
+    if (bpLeaderActive) return;                                     // la tecla l\u00EDder gestiona su propio Esc
+    const hadMenu = bpMenuIsOpen();
+    if (bpCloseOpenPopups()) { e.preventDefault(); e.stopPropagation(); bpRefocusEditor(); return; }
+    // Sin nada abierto: Esc va al primer men\u00FA (Archivo), como en la versi\u00F3n de terminal.
+    // No se toca si Esc le corresponde a un widget de M\u00F3naco (buscar, sugerencias, paleta) o a un campo de texto ajeno al editor.
+    const t = e.target;
+    if (t && t.closest && (t.closest(".quick-input-widget") || (t.closest(".monaco-editor") && !t.classList.contains("inputarea")))) return;
+    if (bpIsEditableTarget(t) && !bpInEditorTarget(t)) return;
+    if (document.querySelector(".monaco-editor .find-widget.visible, .monaco-editor .suggest-widget.visible, .monaco-editor .parameter-hints-widget.visible, .monaco-editor .monaco-hover:not(.hidden):not([style*='display: none'])")) return;
+    e.preventDefault(); e.stopPropagation();
+    bpMenuOpenFirst();
+    return;
+  }
 
   const mod = e.ctrlKey || e.metaKey, alt = e.altKey, shift = e.shiftKey;
   const k = key.length === 1 ? key.toLowerCase() : key;
@@ -3051,7 +3087,72 @@ function bpMenuRun(fn) {
   } catch (err) { xo("\u26A0 " + err.message); }
 }
 
-function bpMenuOpen(id, btn) {
+function bpMenuRows() { return bpMenuEl ? Array.from(bpMenuEl.querySelectorAll(".menu-item")) : []; }
+
+function bpMenuSetActive(i) {
+  const rows = bpMenuRows();
+  rows.forEach(r => r.classList.remove("kb-active"));
+  if (i < 0 || !rows.length) return;
+  i = (i + rows.length) % rows.length;
+  rows[i].classList.add("kb-active");
+  rows[i].scrollIntoView({ block: "nearest" });
+}
+
+function bpMenuActiveIndex() { return bpMenuRows().findIndex(r => r.classList.contains("kb-active")); }
+
+function bpMenuTitles() { return Array.from(document.querySelectorAll("#menubar .menu-title")); }
+
+// Devuelve el foco al editor (o a la vista de texto) al salir de los men\u00FAs / ventanas con Esc
+function bpRefocusEditor() {
+  try {
+    if (!sp()) return;
+    if (lp === "edit") Nt.focus();
+    else if (lp === "text" && Xtv) Xtv.focus();
+  } catch (e) {}
+}
+
+// Esc abre el primer men\u00FA (Archivo) y se navega con el teclado
+function bpMenuOpenFirst() {
+  const t = bpMenuTitles()[0];
+  if (t) { bpMenuOpen(t.dataset.menu, t, true); }
+}
+
+function bpMenuKey(e) {   // devuelve true si la tecla se ha consumido
+  if (e.ctrlKey || e.metaKey || e.altKey) return false;
+  const key = e.key;
+  if (["Shift", "Control", "Alt", "Meta", "AltGraph", "CapsLock"].includes(key)) return false;
+  const stop = () => { e.preventDefault(); e.stopPropagation(); };
+  const rows = bpMenuRows(), cur = bpMenuActiveIndex();
+  const titles = bpMenuTitles(), ti = titles.findIndex(t => t.dataset.menu === bpMenuOpenId);
+  if (key === "ArrowDown") { stop(); bpMenuSetActive(cur < 0 ? 0 : cur + 1); return true; }
+  if (key === "ArrowUp") { stop(); bpMenuSetActive(cur < 0 ? rows.length - 1 : cur - 1); return true; }
+  if (key === "Home") { stop(); bpMenuSetActive(0); return true; }
+  if (key === "End") { stop(); bpMenuSetActive(rows.length - 1); return true; }
+  if (key === "ArrowLeft" || key === "ArrowRight") {
+    stop();
+    const n = titles[(ti + (key === "ArrowRight" ? 1 : -1) + titles.length) % titles.length];
+    bpMenuOpen(n.dataset.menu, n, true);
+    return true;
+  }
+  if (key === "Enter" || key === " ") {
+    stop();
+    if (cur >= 0) rows[cur].click();
+    return true;
+  }
+  if (key === "Tab") { stop(); bpMenuClose(); bpRefocusEditor(); return true; }
+  if (key.length === 1) {   // saltar por la inicial de la opci\u00F3n
+    stop();
+    const ch = key.toLowerCase(), n = rows.length;
+    for (let d = 1; d <= n; d++) {
+      const r = rows[(Math.max(cur, -1) + d + n) % n];
+      if (r.querySelector(".menu-label").textContent.trim().toLowerCase().startsWith(ch)) { bpMenuSetActive(rows.indexOf(r)); break; }
+    }
+    return true;
+  }
+  return false;
+}
+
+function bpMenuOpen(id, btn, kb) {
   const items = BP_MENUS[id];
   if (!items) return;
   if (!bpMenuEl) {
@@ -3094,6 +3195,7 @@ function bpMenuOpen(id, btn) {
   bpMenuEl.style.maxHeight = Math.max(160, window.innerHeight - r.bottom - 12) + "px";
   bpMenuEl.style.top = r.bottom + "px";
   bpMenuEl.style.left = Math.max(6, Math.min(r.left, window.innerWidth - bpMenuEl.offsetWidth - 6)) + "px";
+  bpMenuSetActive(kb ? 0 : -1);
 }
 
 document.querySelectorAll("#menubar .menu-title").forEach(btn => {
@@ -3118,7 +3220,7 @@ bpLeaderActions.e = () => bpSetDict("eu_ES");          // Ctrl+R e: euskera
 bpLeaderActions.c = () => bpSetDict("es_ES");          // Ctrl+R c: espa\u00F1ol
 bpLeaderActions.m = () => { if (sp()) nB("edit"); else xo("Ning\u00FAn archivo abierto"); };   // Ctrl+R m: M\u00F3naco
 bpLeaderActions.k = () => bpInsertLink();
-delete bpLeaderActions.n;
+bpLeaderActions.n = () => bpToggleBullets();   // Ctrl+R n: vi\u00F1etas
 
 /* ------------------------------------------------------------------ */
 /* Corrector: fijar idioma (Ctrl+R e / Ctrl+R c) y bot\u00F3n \u00FAnico          */
