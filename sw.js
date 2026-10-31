@@ -1,4 +1,4 @@
-const CACHE_NAME = "bubipad-shell-v17";
+const CACHE_NAME = "bubipad-shell-v18";
 
 // Recursos grandes y estables: se sirven desde caché (rápido) y se
 // actualizan en segundo plano. Todo lo demás (el código de la app) se

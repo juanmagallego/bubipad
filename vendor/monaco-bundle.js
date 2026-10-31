@@ -908,7 +908,7 @@ function nB(o){lp&&lp!=="preview"&&(bpLastEditMode=lp),lp=o;let t=sp();t&&(t.mod
 async function bpLeaderToggleLang(){let cur=p2();try{cur==="es_ES"?await bpToggleDict("eu_ES"):cur==="eu_ES"?await bpToggleDict("eu_ES"):await bpToggleDict("es_ES")}catch(e){xo(`\u26A0 ${e.message}`)}}
 function bpLeaderToggleCase(){if(lp!=="edit"){xo("Cambia a Monaco y selecciona texto");return}let model=Nt.getModel(),sel=Nt.getSelection();if(!model||!sel||sel.isEmpty()){xo("Selecciona texto primero"),Nt.focus();return}let text=model.getValueInRange(sel),newText=text===text.toUpperCase()?text.toLowerCase():text.toUpperCase(),startOffset=model.getOffsetAt(sel.getStartPosition());Nt.executeEdits("toggle-case",[{range:sel,text:newText}]);let m2=Nt.getModel(),startPos=m2.getPositionAt(startOffset),endPos=m2.getPositionAt(startOffset+newText.length);Nt.setSelection(new DF(startPos.lineNumber,startPos.column,endPos.lineNumber,endPos.column)),Nt.focus()}
 let bpLeaderActive=!1,bpLeaderTimer=null;
-const bpLeaderHint="Ctrl+R (o Ctrl+.), letra: s guardar \xB7 a guardar como \xB7 y exportar \xB7 o carpeta \xB7 b archivo \xB7 g github \xB7 p buscar archivo \xB7 h home \xB7 f buscar \xB7 r reemplazar \xB7 k enlace \xB7 u enlaces \xB7 d borrar l\xEDnea \xB7 w Aa \xB7 m editor (M\xF3naco) \xB7 v vista previa \xB7 t texto \xB7 e euskera \xB7 c espa\xF1ol \xB7 i idioma \xB7 z corrector \xB7 l tema \xB7 +/- zoom \xB7 \u2190/\u2192 historial \xB7 q cerrar \xB7 ? ayuda";
+const bpLeaderHint="Ctrl+R (o Ctrl+.), letra: s guardar \xB7 a guardar como \xB7 y exportar \xB7 o carpeta \xB7 b archivo \xB7 g github \xB7 p buscar archivo \xB7 h home \xB7 f buscar \xB7 r reemplazar \xB7 k enlace \xB7 u enlaces \xB7 d borrar l\xEDnea \xB7 w Aa \xB7 n vi\xF1etas \xB7 m editor (M\xF3naco) \xB7 v vista previa \xB7 t texto \xB7 e euskera \xB7 c espa\xF1ol \xB7 i idioma \xB7 z corrector \xB7 l tema \xB7 +/- zoom \xB7 \u2190/\u2192 historial \xB7 q cerrar \xB7 ? ayuda";
 const bpLeaderActions={
   s:()=>{Jre().then(()=>xo("Guardado")).catch(e=>e.name!=="AbortError"&&xo(`\u26A0 ${e.message}`))},
   a:()=>bpSaveAs(),
@@ -1022,6 +1022,23 @@ function bpGhSortChildren(node) {
 // Con varios, la raíz del explorador contiene un nodo por repositorio; cada
 // uno carga su \u00e1rbol la primera vez que se despliega (o se busca en \u00e9l).
 const BP_GH_MAX_AUTO_REPOS = 6;
+// Prioridad de un archivo como \u00ABhome\u00BB: 0 = Home.md exacto, 1 = el nombre empieza por \u00ABhome\u00BB (Home_ALEA.md), 2 = lo contiene
+function bpHomeScore(name) {
+  const n = String(name).toLowerCase();
+  if (n === "home.md") return 0;
+  if (n.startsWith("home")) return 1;
+  if (n.includes("home")) return 2;
+  return 99;
+}
+function bpHomeBetter(a, b) {   // a es mejor candidato que b (b puede ser null); ambos {score, depth}
+  if (!b) return true;
+  return a.score < b.score || (a.score === b.score && a.depth < b.depth);
+}
+// Repositorio principal: se carga siempre el primero
+function bpIsMainRepo(name) { return String(name).toLowerCase() === "notas"; }
+function bpMainRepoFirst(list) {   // orden estable: Notas primero
+  return list.slice().sort((a, b) => (bpIsMainRepo(a.repo) ? 0 : 1) - (bpIsMainRepo(b.repo) ? 0 : 1));
+}
 let bpGhRepoList = [];            // [{owner, repo, branch}] abiertos ahora
 let bpGhLastRepo = null;          // "owner/repo" donde se abri\u00f3 un archivo por \u00faltima vez
 
@@ -1048,8 +1065,9 @@ async function bpGhLoadTreeInto(node, owner, repo, branch) {
       nodeByPath.set(entry.path, child);
     }
     parent.children.push(child);
-    if (kind === "file" && bpLooksLikeTextFile(name) && name.toLowerCase().includes("home") && (!home || parts.length < home.depth)) {
-      home = { node: child, depth: parts.length };
+    if (kind === "file" && bpLooksLikeTextFile(name) && name.toLowerCase().includes("home")) {
+      let cand = { node: child, depth: parts.length, score: bpHomeScore(name) };
+      if (bpHomeBetter(cand, home)) home = cand;
     }
   }
   bpGhSortChildren(node);
@@ -1078,6 +1096,7 @@ async function bpGhLoadRepoNode(node) {
 }
 
 async function bpGhOpenRepos(list, autoHome = false) {
+  list = bpMainRepoFirst(list);   // Notas (el principal) se carga primero
   bpGhRepoList = list;
   let first = list[0];
   bpGhOwner = first.owner; bpGhRepo = first.repo; bpGhBranch = first.branch;
@@ -1107,14 +1126,15 @@ async function bpGhOpenRepos(list, autoHome = false) {
   if (!autoHome) return;   // no se busca ningun archivo "home" al abrir: pantalla de inicio
   // El "home" se busca primero en el \u00faltimo repositorio usado y despu\u00e9s en el resto; se abre el primero que lo tenga
   let order = wr.children.slice().sort((a, b) => {
-    let fa = `${a.handle.owner}/${a.handle.repo}` === bpGhLastRepo ? 0 : 1;
-    let fb = `${b.handle.owner}/${b.handle.repo}` === bpGhLastRepo ? 0 : 1;
-    return fa - fb;
+    const rank = n => bpIsMainRepo(n.handle.repo) ? 0 : (`${n.handle.owner}/${n.handle.repo}` === bpGhLastRepo ? 1 : 2);
+    return rank(a) - rank(b);
   });
   let opened = null;
   for (let node of order) {
     await bpGhLoadRepoNode(node);
-    if (node.children && node.__home) { opened = node; break; }
+    if (!node.children || !node.__home) continue;
+    if (!opened || bpHomeBetter(node.__home, opened.__home)) opened = node;
+    if (opened.__home.score === 0) break;   // Home.md exacto: no hace falta seguir
   }
   if (opened) {
     opened.expanded = true;
@@ -1145,7 +1165,7 @@ async function bpGhDiscoverRepos() {
   let usable = all.filter(r => !r.archived && !r.disabled);
   let writable = usable.filter(r => r.permissions && r.permissions.push);
   let chosen = writable.length ? writable : usable;
-  chosen.sort((a, b) => a.name.localeCompare(b.name, "es", { sensitivity: "base" }));
+  chosen.sort((a, b) => ((bpIsMainRepo(a.name) ? 0 : 1) - (bpIsMainRepo(b.name) ? 0 : 1)) || a.name.localeCompare(b.name, "es", { sensitivity: "base" }));
   let extra = Math.max(0, chosen.length - BP_GH_MAX_AUTO_REPOS);
   return {
     repos: chosen.slice(0, BP_GH_MAX_AUTO_REPOS).map(r => ({ owner: r.owner.login, repo: r.name, branch: r.default_branch })),
@@ -1722,10 +1742,10 @@ async function bpToggleFileSearchPopup() {
 async function bpOpenHomeFile() {
   if (!wr) { xo("Ning\u00FAn archivo ni repositorio abierto"); return; }
   let index = await bpBuildFileIndex();
-  let candidates = index.filter(item => item.node.name.toLowerCase().includes("home"));
+  let candidates = index.filter(item => bpHomeScore(item.node.name) < 99);
   if (!candidates.length) { xo('No se encontr\u00F3 ning\u00FAn archivo "home"'); return; }
   const bpHomeRank = it => { if (!wr.handle || !wr.handle.multi) return 0; const seg = it.path.split("/")[0]; const n = wr.children.findIndex(c => c.name === seg); const last = bpGhLastRepo && bpGhLastRepo.split("/")[1] === seg; return last ? -1 : n; };
-  candidates.sort((a, b) => (a.path.split("/").length - b.path.split("/").length) || (bpHomeRank(a) - bpHomeRank(b)) || a.path.localeCompare(b.path, "es", { sensitivity: "base" }));
+  candidates.sort((a, b) => (bpHomeScore(a.node.name) - bpHomeScore(b.node.name)) || (a.path.split("/").length - b.path.split("/").length) || (bpHomeRank(a) - bpHomeRank(b)) || a.path.localeCompare(b.path, "es", { sensitivity: "base" }));
   await bpOpenFileSearchResult(candidates[0]);
   let bpHomeTab = sp();
   if (bpHomeTab && bpHomeTab.title === candidates[0].node.name && lp !== "preview") nB("preview");   // "home" siempre en vista previa
@@ -2583,7 +2603,7 @@ function bpHelpHTML() {
     sec("Edici\u00F3n", [
       [c + "+B", "Negrita"], [c + "+I / Alt+I", "Cursiva"], [c + "+K", "Insertar enlace (usa el portapapeles)"],
       ["Alt+E o \u00AB:\u00BB", "Selector de emojis"], [c + "+U", "min\u00FAsculas \u2192 MAY\u00DASCULAS \u2192 T\u00EDtulo"],
-      [c + "+J", "Unir l\u00EDneas"], [c + "+D / " + c + "+Shift+K", "Eliminar l\u00EDnea"],
+      [c + "+J", "Unir l\u00EDneas"], [c + "+D / " + c + "+Shift+K", "Eliminar l\u00EDnea"], [c + "+Shift+8", "Poner o quitar vi\u00F1etas / lista en las l\u00EDneas seleccionadas"],
       [c + "+L", "Seleccionar l\u00EDnea"], [c + "+\u2191 / " + c + "+\u2193", "Inicio / final del archivo"],
       ["Alt+\u2191/\u2193 o " + c + "+Shift+\u2191/\u2193", "Mover l\u00EDnea"], ["Alt+May\u00FAs+\u2191/\u2193", "Duplicar l\u00EDnea"],
       ["Alt+X", "Unicode \u2194 car\u00E1cter"], [c + "+F / " + c + "+H", "Buscar / reemplazar"], ["F3 / May\u00FAs+F3", "Resultado siguiente / anterior"],
@@ -2597,7 +2617,7 @@ function bpHelpHTML() {
       ["p h g x q", "buscar archivo \u00B7 home \u00B7 GitHub \u00B7 cerrar carpeta \u00B7 cerrar pesta\u00F1a"],
       ["f r k u", "buscar \u00B7 reemplazar \u00B7 enlace \u00B7 lista de enlaces"],
       ["m v t", "editor (M\u00F3naco) \u00B7 vista previa \u00B7 texto plano"], ["e c", "corrector: euskera \u00B7 espa\u00F1ol"],
-      ["d j w", "borrar l\u00EDnea \u00B7 unir \u00B7 May\u00FAs/min\u00FAs/T\u00EDtulo"],
+      ["d j w n", "borrar l\u00EDnea \u00B7 unir \u00B7 May\u00FAs/min\u00FAs/T\u00EDtulo \u00B7 vi\u00F1etas"],
       ["l i + \u2212", "tema \u00B7 idioma del corrector \u00B7 zoom"], ["\u2190 \u2192 \u2191 \u2193", "historial \u00B7 mover l\u00EDnea"],
       ["Tab / May\u00FAs+Tab", "pesta\u00F1a siguiente / anterior"], ["?", "esta ayuda"]]);
 }
@@ -2635,6 +2655,7 @@ bpLeaderActions.arrowup = () => bpMoveLine(-1);
 bpLeaderActions.arrowdown = () => bpMoveLine(1);
 bpLeaderActions["?"] = () => bpToggleHelp();
 bpLeaderActions.w = () => bpApplyCaseCycle();
+bpLeaderActions.n = () => bpToggleBullets();
 bpLeaderActions.z = () => { const cur = p2(); return bpToggleDict(cur || "es_ES"); };
 
 /* --- Manejador \u00FAnico de atajos (fase de captura) ----------------------- */
@@ -2709,6 +2730,7 @@ function bpKeyHandler(e) {
     } else {
       if (k === "p") { done(() => bpNeedMonaco(() => Nt.getAction("editor.action.quickCommand")?.run())); return; }
       if (editTarget && k === "k") { done(bpDeleteLine); return; }
+      if (editTarget && (code === "Digit8" || code === "Numpad8")) { done(bpToggleBullets); return; }
       if (editTarget && (k === "ArrowUp" || k === "ArrowDown")) { done(() => bpMoveLine(k === "ArrowUp" ? -1 : 1)); return; }
     }
   }
@@ -2830,6 +2852,50 @@ async function bpInsertLink() {
   bpTextToModel();
 }
 
+// Poner / quitar vi\u00F1etas o numeraci\u00F3n en todas las l\u00EDneas seleccionadas (o en la del cursor)
+function bpToggleBullets() {
+  if (!sp()) { xo("Ning\u00FAn archivo abierto"); return; }
+  if (lp === "preview") { xo("Pulsa Ctrl+E para editar"); return; }
+  const re = /^(\s*)(?:[-*+]\s+(?:\[[ xX]\]\s+)?|\d+[.)]\s+)/;
+  const transform = lines => {
+    const body = lines.filter(l => l.trim() !== "");
+    if (!body.length) return lines.length === 1 ? ["- "] : lines;
+    const all = body.every(l => re.test(l));
+    return lines.map(l => {
+      if (l.trim() === "") return l;
+      if (all) return l.replace(re, "$1");
+      return re.test(l) ? l : l.replace(/^(\s*)/, "$1- ");
+    });
+  };
+  if (lp === "text") {
+    const ta = Xtv, v = ta.value, s0 = ta.selectionStart;
+    let e0 = ta.selectionEnd;
+    if (e0 > s0 && v[e0 - 1] === "\n") e0--;
+    const ls = v.lastIndexOf("\n", s0 - 1) + 1;
+    let le = v.indexOf("\n", e0); if (le === -1) le = v.length;
+    const out = transform(v.slice(ls, le).split("\n")).join("\n");
+    bpTextReplace(ls, le, out);
+    ta.setSelectionRange(ls, ls + out.length);
+    bpTextToModel();
+    return;
+  }
+  const model = Nt.getModel(), sel = Nt.getSelection();
+  if (!model || !sel) return;
+  const l1 = sel.startLineNumber;
+  let l2 = sel.endLineNumber;
+  if (l2 > l1 && sel.endColumn === 1) l2--;       // la selecci\u00F3n acaba al inicio de una l\u00EDnea: esa no se toca
+  const lines = [];
+  for (let i = l1; i <= l2; i++) lines.push(model.getLineContent(i));
+  const out = transform(lines);
+  Nt.pushUndoStop();
+  Nt.executeEdits("bubipad-bullets", [{ range: { startLineNumber: l1, startColumn: 1, endLineNumber: l2, endColumn: model.getLineMaxColumn(l2) }, text: out.join("\n") }]);
+  Nt.pushUndoStop();
+  const lastLen = out[out.length - 1].length;
+  if (l1 === l2 && sel.isEmpty()) Nt.setPosition({ lineNumber: l1, column: lastLen + 1 });
+  else Nt.setSelection({ startLineNumber: l1, startColumn: 1, endLineNumber: l2, endColumn: lastLen + 1 });
+  Nt.focus();
+}
+
 function bpJoinLines() {
   if (!sp()) { xo("Ning\u00FAn archivo abierto"); return; }
   if (lp === "preview") { xo("Pulsa Ctrl+E para editar"); return; }
@@ -2911,6 +2977,7 @@ const BP_MENUS = {
     ["Ir al inicio del archivo", "Ctrl+\u2191", () => bpDocEdge(false)],
     ["Ir al final del archivo", "Ctrl+\u2193", () => bpDocEdge(true)],
     ["May\u00FAs. / min\u00FAs. / T\u00EDtulo", "Ctrl+U", () => bpApplyCaseCycle()],
+    ["Vi\u00F1etas / lista: poner o quitar", "Ctrl+Shift+8", () => bpToggleBullets()],
     ["min\u00FAsculas", "", () => bpApplyCaseCycle(t => t.toLowerCase())],
     ["MAY\u00DASCULAS", "", () => bpApplyCaseCycle(t => t.toUpperCase())],
     ["Unicode \u2194 car\u00E1cter", "Alt+X", bpNeedTab(() => bpNeedMonaco(() => bpUnicodeToggle()))],

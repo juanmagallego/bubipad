@@ -41,21 +41,11 @@
         </button>
         <button id="file-search-btn" title="Buscar archivo por nombre (Ctrl+O o Ctrl+., p)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 2 h5 l2.5 2.5 v9 a0.6 0.6 0 0 1 -0.6 0.6 h-6.9 a0.6 0.6 0 0 1 -0.6 -0.6 v-10.9 a0.6 0.6 0 0 1 0.6 -0.6 Z"/>
-            <path d="M8 2 v2.5 h2.5"/>
-            <circle cx="7" cy="10" r="1.8"/>
-            <path d="M8.3 11.3 L9.8 12.8"/>
+                        <path d="M1.5 4.2 a1 1 0 0 1 1 -1 h3.4 l1.6 1.8 h5.5 a1 1 0 0 1 1 1 v6 a1 1 0 0 1 -1 1 h-10.5 a1 1 0 0 1 -1 -1 Z"/>
           </svg>
         </button>
       </div>
       <div class="group">
-        <button id="delete-line-btn" title="Eliminar línea (Ctrl+D, Ctrl+Shift+K o Ctrl+., d)">
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 5.5 h10"/>
-            <path d="M6.5 5.5 v-1.3 a1 1 0 0 1 1 -1 h1 a1 1 0 0 1 1 1 v1.3"/>
-            <path d="M4.5 5.5 l0.7 6.5 a1 1 0 0 0 1 0.9 h3.6 a1 1 0 0 0 1 -0.9 l0.7 -6.5"/>
-          </svg>
-        </button>
         <button id="move-line-up-btn" title="Mover línea arriba (Alt+↑)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 13 V3"/>
@@ -72,9 +62,10 @@
       <div class="group">
         <button id="outline-btn" title="Esquema de títulos del documento (Ctrl+T, Ctrl+Shift+M o Ctrl+., m)">
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2.5 3.5 h4.5"/>
-            <path d="M5 7.5 h6.5"/>
-            <path d="M7.5 11.5 h5.5"/>
+            <rect x="5.5" y="1.8" width="5" height="3.2" rx="0.6"/>
+            <path d="M8 5 v2.6 M3.5 10 v-2.4 h9 v2.4"/>
+            <rect x="1.2" y="10" width="4.6" height="3.2" rx="0.6"/>
+            <rect x="10.2" y="10" width="4.6" height="3.2" rx="0.6"/>
           </svg>
         </button>
         <button id="search-btn" title="Buscar en el documento (Ctrl+F o Ctrl+., f)">
@@ -91,11 +82,18 @@
         </button>
       </div>
       <div class="group right">
+        <button id="lang-eu-btn" title="Corrector ortográfico: Euskera">
+          <span class="font-btn-label">EU</span>
+        </button>
         <button id="lang-es-btn" title="Corrector ortográfico: Español">
           <span class="font-btn-label">ES</span>
         </button>
-        <button id="lang-eu-btn" title="Corrector ortográfico: Euskera">
-          <span class="font-btn-label">EU</span>
+        <button id="delete-line-btn" title="Eliminar línea (Ctrl+D, Ctrl+Shift+K o Ctrl+., d)">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 5.5 h10"/>
+            <path d="M6.5 5.5 v-1.3 a1 1 0 0 1 1 -1 h1 a1 1 0 0 1 1 1 v1.3"/>
+            <path d="M4.5 5.5 l0.7 6.5 a1 1 0 0 0 1 0.9 h3.6 a1 1 0 0 0 1 -0.9 l0.7 -6.5"/>
+          </svg>
         </button>
       </div>
     </div>
@@ -138,7 +136,7 @@
  |____/ \__,_|_.__/|_|_|   \__,_|\__,_|</pre>
           <div id="welcome-links">
             <div class="welcome-row">
-              <button type="button" id="welcome-search" class="welcome-link" title="Buscar archivo por nombre (Ctrl+O)"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2 h5 l2.5 2.5 v9 a0.6 0.6 0 0 1 -0.6 0.6 h-6.9 a0.6 0.6 0 0 1 -0.6 -0.6 v-10.9 a0.6 0.6 0 0 1 0.6 -0.6 Z"/><path d="M8 2 v2.5 h2.5"/><circle cx="7" cy="10" r="1.8"/><path d="M8.3 11.3 L9.8 12.8"/></svg><span>ARCHIVO</span></button>
+              <button type="button" id="welcome-search" class="welcome-link" title="Buscar archivo por nombre (Ctrl+O)"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 4.2 a1 1 0 0 1 1 -1 h3.4 l1.6 1.8 h5.5 a1 1 0 0 1 1 1 v6 a1 1 0 0 1 -1 1 h-10.5 a1 1 0 0 1 -1 -1 Z"/></svg><span>ARCHIVO</span></button>
               <button type="button" id="welcome-home" class="welcome-link" title="Abrir el archivo «home» en vista previa (Alt+H)"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8 L8 2.5 L14 8"/><path d="M3.8 7 v6.2 a0.6 0.6 0 0 0 0.6 0.6 h7.2 a0.6 0.6 0 0 0 0.6 -0.6 v-6.2"/><path d="M6.6 13.8 v-3.6 h2.8 v3.6"/></svg><span>HOME</span></button>
             </div>
             <div class="welcome-row">
