@@ -3253,6 +3253,17 @@ function bpGsVisible() {
   return bpGs.items.filter(it => it.repository && ok.has(String(it.repository.full_name).toLowerCase()));
 }
 
+// Si no hay respuesta, distingue si falla toda la API o solo la b\u00FAsqueda de c\u00F3digo
+async function bpGsDiagnose() {
+  try {
+    const r = await bpGhApi("/rate_limit");
+    const cs = r && r.resources && (r.resources.code_search || r.resources.search);
+    return "Diagn\u00F3stico: la API de GitHub responde (/rate_limit OK)" + (cs ? `; b\u00FAsquedas de c\u00F3digo restantes: ${cs.remaining}/${cs.limit}, se reinician a las ${new Date(cs.reset * 1000).toLocaleTimeString()}` : "") + ". Falla solo la consulta de b\u00FAsqueda.";
+  } catch (e) {
+    return "Diagn\u00F3stico: tampoco responde /rate_limit (" + e.message + ").";
+  }
+}
+
 function bpGsErrText(e) {
   const m = (e && e.message) || String(e);
   if (/rate limit/i.test(m)) return m + " Espera un minuto (GitHub permite 10 b\u00FAsquedas de c\u00F3digo por minuto).";
@@ -3299,7 +3310,13 @@ async function bpGsSearch() {
     bpGs.busy = false; bpGs.error = "La consulta es demasiado larga (GitHub admite 256 caracteres contando los repositorios)."; bpGsRender(); return;
   }
   bpGsRender();
-  try { await bpGsFetchMore(run); } catch (e) { if (run === bpGs.run) bpGs.error = bpGsErrText(e); }
+  try { await bpGsFetchMore(run); } catch (e) {
+    if (run === bpGs.run) {
+      console.error("BubiPad b\u00FAsqueda global:", chunks.map(c => c.q), e);
+      bpGs.error = bpGsErrText(e);
+      if (/no se pudo conectar/i.test(e.message)) bpGs.error += " " + await bpGsDiagnose();
+    }
+  }
   if (run !== bpGs.run) return;
   bpGs.busy = false;
   bpGs.active = bpGsVisible().length ? 0 : -1;
