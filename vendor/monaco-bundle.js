@@ -3234,9 +3234,16 @@ function bpGsHint() {
   return "Busca en la rama por defecto de: " + names.join(", ") + " \u00B7 \u00ABfrase exacta\u00BB, OR, NOT, path:, extension: \u00B7 m\u00E1x. 10 b\u00FAsquedas por minuto.";
 }
 
+// Forma de la consulta: "multi" (varios repo: juntos), "single" (una consulta por repositorio),
+// "user" (user:propietario). Si GitHub no responde a una forma, la app prueba las otras sola.
+var bpGsMode = "multi";
+
 // Una consulta por grupo de repositorios que quepa en el l\u00EDmite de 256 caracteres de GitHub
 function bpGsBuildChunks(q) {
   if (BP_GS_OWN_SCOPE.test(q)) return [{ q, page: 0, done: false, total: 0 }];
+  const mk = qq => ({ q: qq, page: 0, done: false, total: 0 });
+  if (bpGsMode === "single") return (bpGhRepoList || []).map(r => mk(`${q} repo:${r.owner}/${r.repo}`));
+  if (bpGsMode === "user") return Array.from(new Set((bpGhRepoList || []).map(r => r.owner))).map(o => mk(`${q} user:${o}`));
   const repos = (bpGhRepoList || []).map(r => `repo:${r.owner}/${r.repo}`);
   const groups = []; let cur = [];
   for (const r of repos) {
@@ -3253,15 +3260,31 @@ function bpGsVisible() {
   return bpGs.items.filter(it => it.repository && ok.has(String(it.repository.full_name).toLowerCase()));
 }
 
-// Si no hay respuesta, distingue si falla toda la API o solo la b\u00FAsqueda de c\u00F3digo
-async function bpGsDiagnose() {
-  try {
-    const r = await bpGhApi("/rate_limit");
-    const cs = r && r.resources && (r.resources.code_search || r.resources.search);
-    return "Diagn\u00F3stico: la API de GitHub responde (/rate_limit OK)" + (cs ? `; b\u00FAsquedas de c\u00F3digo restantes: ${cs.remaining}/${cs.limit}, se reinician a las ${new Date(cs.reset * 1000).toLocaleTimeString()}` : "") + ". Falla solo la consulta de b\u00FAsqueda.";
-  } catch (e) {
-    return "Diagn\u00F3stico: tampoco responde /rate_limit (" + e.message + ").";
+// Si no hay respuesta del navegador, prueba otras formas de consulta y devuelve la que funcione
+async function bpGsDiagnose(q) {
+  const term = q.replace(/(^|\s)-?\w+:\S+/g, " ").replace(/"/g, "").trim().split(/\s+/)[0] || "test";
+  const list = bpGhRepoList || [];
+  const probe = async path => {
+    try { const d = await bpGhApi(path); return { ok: true, n: d && d.total_count }; }
+    catch (e) { return { ok: false, msg: /no se pudo conectar/i.test(e.message) ? "sin respuesta" : e.message }; }
+  };
+  const code = qq => `/search/code?q=${encodeURIComponent(qq)}&per_page=1`;
+  const lines = [];
+  if (list.length) {
+    const r1 = await probe(code(`${term} repo:${list[0].owner}/${list[0].repo}`));
+    if (r1.ok) return { mode: "single", text: "" };
+    lines.push(`1 repositorio: ${r1.msg}`);
+    const r2 = await probe(code(`${term} user:${list[0].owner}`));
+    if (r2.ok) return { mode: "user", text: "" };
+    lines.push(`user:${list[0].owner}: ${r2.msg}`);
   }
+  const r3 = await probe(code("hello repo:octocat/Hello-World"));
+  lines.push(`repositorio p\u00FAblico de prueba: ${r3.ok ? "OK" : r3.msg}`);
+  const r4 = await probe(`/search/repositories?q=${encodeURIComponent(term)}&per_page=1`);
+  lines.push(`b\u00FAsqueda de repositorios: ${r4.ok ? "OK" : r4.msg}`);
+  const r5 = await probe("/rate_limit");
+  lines.push(`/rate_limit: ${r5.ok ? "OK" : r5.msg}`);
+  return { mode: null, text: "Diagn\u00F3stico \u2192 " + lines.join(" \u00B7 ") };
 }
 
 function bpGsErrText(e) {
@@ -3310,11 +3333,24 @@ async function bpGsSearch() {
     bpGs.busy = false; bpGs.error = "La consulta es demasiado larga (GitHub admite 256 caracteres contando los repositorios)."; bpGsRender(); return;
   }
   bpGsRender();
-  try { await bpGsFetchMore(run); } catch (e) {
-    if (run === bpGs.run) {
-      console.error("BubiPad b\u00FAsqueda global:", chunks.map(c => c.q), e);
+  for (let attempt = 0; ; attempt++) {
+    try { await bpGsFetchMore(run); break; }
+    catch (e) {
+      if (run !== bpGs.run) return;
+      console.error("BubiPad b\u00FAsqueda global:", bpGs.chunks.map(c => c.q), e);
       bpGs.error = bpGsErrText(e);
-      if (/no se pudo conectar/i.test(e.message)) bpGs.error += " " + await bpGsDiagnose();
+      if (/no se pudo conectar/i.test(e.message) && !BP_GS_OWN_SCOPE.test(q)) {
+        const diag = await bpGsDiagnose(q);
+        if (run !== bpGs.run) return;
+        if (diag.mode && diag.mode !== bpGsMode && attempt === 0) {   // otra forma de consulta s\u00ED responde: se usa
+          bpGsMode = diag.mode;
+          Object.assign(bpGs, { chunks: bpGsBuildChunks(q), items: [], total: 0, incomplete: false, noFragments: false, error: "" });
+          bpGsRender();
+          continue;
+        }
+        bpGs.error += " " + diag.text;
+      }
+      break;
     }
   }
   if (run !== bpGs.run) return;
@@ -3383,6 +3419,7 @@ function bpGsRender() {
     st = vis.length + (vis.length === 1 ? " archivo" : " archivos");
     if (bpGs.total > vis.length) st += " de ~" + bpGs.total;
     if (bpGs.incomplete) st += " \u00B7 resultado incompleto (tiempo l\u00EDmite de GitHub)";
+    if (bpGsMode !== "multi") st += bpGsMode === "single" ? " \u00B7 una consulta por repositorio" : " \u00B7 consulta por propietario";
     if (bpGs.noFragments) st += " \u00B7 sin fragmentos (el navegador no ha admitido pedirlos)";
   }
   bpGsStatus.textContent = st;
