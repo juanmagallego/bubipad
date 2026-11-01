@@ -38,7 +38,6 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+B` / `Ctrl+I` (o `Alt+I`) — Negrita / cursiva · `Ctrl+K` — Insertar enlace (usa el portapapeles como URL)
 - `Alt+E` o `:` — Selector de emojis
 - `Ctrl+U` — minúsculas → MAYÚSCULAS → Título → minúsculas (sobre la selección o la palabra bajo el cursor)
-- `Ctrl+Shift+F` (o Editar → «Buscar en repositorios…») — Búsqueda global en el **contenido** de los repositorios abiertos, con la API de búsqueda de código de GitHub. `Intro` busca; `↑`/`↓` eligen resultado e `Intro` lo abre y salta a la primera coincidencia; «Más resultados» pide la página siguiente. Si hay texto seleccionado, se usa como consulta. Admite `"frase exacta"`, `OR`, `NOT`, `path:` y `extension:`; no admite expresiones regulares. Limitaciones de GitHub: solo la rama por defecto, archivos de menos de 384 KB y 10 búsquedas por minuto; lo recién guardado puede tardar en aparecer. No se guarda nada en caché ni en disco: cada búsqueda va a la red.
 - `Ctrl+Shift+8` (o `Ctrl+R` `n`) — Poner o quitar viñetas/lista en todas las líneas seleccionadas: si todas ya son viñeta (`- `, `* `, `+ `, `- [ ] `) o lista numerada (`1. `), se quitan; si no, se añade `- ` a las que no la tienen (sin tocar las líneas vacías). Está también en Editar
 - `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Ctrl+L` — Seleccionar línea
 - `Ctrl+↑` / `Ctrl+↓` — Inicio / final del archivo (en macOS, `Cmd+↑/↓`)

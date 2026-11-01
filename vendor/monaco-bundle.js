@@ -2623,7 +2623,7 @@ function bpHelpHTML() {
     sec("Edici\u00F3n", [
       [c + "+B", "Negrita"], [c + "+I / Alt+I", "Cursiva"], [c + "+K", "Insertar enlace (usa el portapapeles)"],
       ["Alt+E o \u00AB:\u00BB", "Selector de emojis"], [c + "+U", "min\u00FAsculas \u2192 MAY\u00DASCULAS \u2192 T\u00EDtulo"],
-      [c + "+J", "Unir l\u00EDneas"], [c + "+D / " + c + "+Shift+K", "Eliminar l\u00EDnea"], [c + "+Shift+8", "Poner o quitar vi\u00F1etas / lista en las l\u00EDneas seleccionadas"], [c + "+Shift+F", "Buscar en el contenido de los repositorios (GitHub)"],
+      [c + "+J", "Unir l\u00EDneas"], [c + "+D / " + c + "+Shift+K", "Eliminar l\u00EDnea"], [c + "+Shift+8", "Poner o quitar vi\u00F1etas / lista en las l\u00EDneas seleccionadas"],
       [c + "+L", "Seleccionar l\u00EDnea"], [c + "+\u2191 / " + c + "+\u2193", "Inicio / final del archivo"],
       ["Alt+\u2191/\u2193 o " + c + "+Shift+\u2191/\u2193", "Mover l\u00EDnea"], ["Alt+May\u00FAs+\u2191/\u2193", "Duplicar l\u00EDnea"],
       ["Alt+X", "Unicode \u2194 car\u00E1cter"], [c + "+F / " + c + "+H", "Buscar / reemplazar"], ["F3 / May\u00FAs+F3", "Resultado siguiente / anterior"],
@@ -2691,7 +2691,7 @@ function bpIsEditableTarget(t) {
 function bpCloseOpenPopups() {
   let closed = false;
   if (bpMenuIsOpen()) { bpMenuClose(); closed = true; }
-  for (const id of ["outline-popup", "file-search-popup", "global-search-popup", "github-popup", "lang-popup", "help-popup"]) {
+  for (const id of ["outline-popup", "file-search-popup", "github-popup", "lang-popup", "help-popup"]) {
     const el = document.getElementById(id);
     if (el && el.style.display === "block") { el.style.display = "none"; closed = true; }
   }
@@ -2765,7 +2765,6 @@ function bpKeyHandler(e) {
       }
     } else {
       if (k === "p") { done(() => bpNeedMonaco(() => Nt.getAction("editor.action.quickCommand")?.run())); return; }
-      if (k === "f") { done(bpToggleGlobalSearch); return; }
       if (editTarget && k === "k") { done(bpDeleteLine); return; }
       if (editTarget && (code === "Digit8" || code === "Numpad8")) { done(bpToggleBullets); return; }
       if (editTarget && (k === "ArrowUp" || k === "ArrowDown")) { done(() => bpMoveLine(k === "ArrowUp" ? -1 : 1)); return; }
@@ -3002,7 +3001,6 @@ const BP_MENUS = {
     "-",
     ["Buscar\u2026", "Ctrl+F", bpMonacoAction("actions.find")],
     ["Reemplazar\u2026", "Ctrl+R r", bpMonacoAction("editor.action.startFindReplaceAction")],
-    ["Buscar en repositorios\u2026", "Ctrl+Shift+F", () => bpToggleGlobalSearch()],
     "-",
     ["Negrita", "Ctrl+B", () => bpWrap("**", "**", "texto en negrita")],
     ["Cursiva", "Ctrl+I", () => bpWrap("*", "*", "texto en cursiva")],
@@ -3215,312 +3213,6 @@ document.addEventListener("pointerdown", ev => {
 }, true);
 window.addEventListener("resize", bpMenuClose);
 window.addEventListener("blur", bpMenuClose);
-
-/* ------------------------------------------------------------------ */
-/* B\u00FAsqueda global en repositorios (API de b\u00FAsqueda de c\u00F3digo de GitHub)  */
-/* Sin cach\u00E9s: no se guarda nada; cada b\u00FAsqueda va a la red (no-store).      */
-/* ------------------------------------------------------------------ */
-var bpGsPopup = document.getElementById("global-search-popup");
-var bpGsInput = document.getElementById("global-search-input");
-var bpGsStatus = document.getElementById("global-search-status");
-var bpGsResults = document.getElementById("global-search-results");
-var bpGs = { q: "", chunks: [], items: [], total: 0, incomplete: false, busy: false, run: 0, active: -1, error: "", filter: true };
-const BP_GS_PER_PAGE = 30, BP_GS_MAX_QUERY = 256;
-const BP_GS_OWN_SCOPE = /(^|\s)-?(repo|user|org|owner):/i;
-
-function bpGsHint() {
-  const names = (bpGhRepoList || []).map(r => r.repo);
-  if (!bpGhToken || !names.length) return "Conecta GitHub (panel GitHub) para buscar en el contenido de tus repositorios.";
-  return "Busca en la rama por defecto de: " + names.join(", ") + " \u00B7 \u00ABfrase exacta\u00BB, OR, NOT, path:, extension: \u00B7 m\u00E1x. 10 b\u00FAsquedas por minuto.";
-}
-
-// Forma de la consulta: "multi" (varios repo: juntos), "single" (una consulta por repositorio),
-// "user" (user:propietario). Si GitHub no responde a una forma, la app prueba las otras sola.
-var bpGsMode = "multi";
-
-// Una consulta por grupo de repositorios que quepa en el l\u00EDmite de 256 caracteres de GitHub
-function bpGsBuildChunks(q) {
-  if (BP_GS_OWN_SCOPE.test(q)) return [{ q, page: 0, done: false, total: 0 }];
-  const mk = qq => ({ q: qq, page: 0, done: false, total: 0 });
-  if (bpGsMode === "single") return (bpGhRepoList || []).map(r => mk(`${q} repo:${r.owner}/${r.repo}`));
-  if (bpGsMode === "user") return Array.from(new Set((bpGhRepoList || []).map(r => r.owner))).map(o => mk(`${q} user:${o}`));
-  const repos = (bpGhRepoList || []).map(r => `repo:${r.owner}/${r.repo}`);
-  const groups = []; let cur = [];
-  for (const r of repos) {
-    if (cur.length && (q + " " + cur.concat(r).join(" ")).length > BP_GS_MAX_QUERY) { groups.push(cur); cur = []; }
-    cur.push(r);
-  }
-  if (cur.length) groups.push(cur);
-  return groups.map(g => ({ q: q + " " + g.join(" "), page: 0, done: false, total: 0 }));
-}
-
-function bpGsVisible() {
-  if (!bpGs.filter) return bpGs.items;
-  const ok = new Set((bpGhRepoList || []).map(r => `${r.owner}/${r.repo}`.toLowerCase()));
-  return bpGs.items.filter(it => it.repository && ok.has(String(it.repository.full_name).toLowerCase()));
-}
-
-// Si no hay respuesta del navegador, prueba otras formas de consulta y devuelve la que funcione
-async function bpGsDiagnose(q) {
-  const term = q.replace(/(^|\s)-?\w+:\S+/g, " ").replace(/"/g, "").trim().split(/\s+/)[0] || "test";
-  const list = bpGhRepoList || [];
-  const probe = async path => {
-    try { const d = await bpGhApi(path); return { ok: true, n: d && d.total_count }; }
-    catch (e) { return { ok: false, msg: /no se pudo conectar/i.test(e.message) ? "sin respuesta" : e.message }; }
-  };
-  const code = qq => `/search/code?q=${encodeURIComponent(qq)}&per_page=1`;
-  const lines = [];
-  if (list.length) {
-    const r1 = await probe(code(`${term} repo:${list[0].owner}/${list[0].repo}`));
-    if (r1.ok) return { mode: "single", text: "" };
-    lines.push(`1 repositorio: ${r1.msg}`);
-    const r2 = await probe(code(`${term} user:${list[0].owner}`));
-    if (r2.ok) return { mode: "user", text: "" };
-    lines.push(`user:${list[0].owner}: ${r2.msg}`);
-  }
-  const r3 = await probe(code("hello repo:octocat/Hello-World"));
-  lines.push(`repositorio p\u00FAblico de prueba: ${r3.ok ? "OK" : r3.msg}`);
-  const r4 = await probe(`/search/repositories?q=${encodeURIComponent(term)}&per_page=1`);
-  lines.push(`b\u00FAsqueda de repositorios: ${r4.ok ? "OK" : r4.msg}`);
-  const r5 = await probe("/rate_limit");
-  lines.push(`/rate_limit: ${r5.ok ? "OK" : r5.msg}`);
-  return { mode: null, text: "Diagn\u00F3stico \u2192 " + lines.join(" \u00B7 ") };
-}
-
-function bpGsErrText(e) {
-  const m = (e && e.message) || String(e);
-  if (/rate limit/i.test(m)) return m + " Espera un minuto (GitHub permite 10 b\u00FAsquedas de c\u00F3digo por minuto).";
-  if (/no se pudo conectar/i.test(m)) return m + " Si has hecho varias b\u00FAsquedas seguidas, espera un minuto (l\u00EDmite de 10 por minuto); si no, revisa la conexi\u00F3n o si alg\u00FAn bloqueador de contenido bloquea api.github.com.";
-  if (/validation failed/i.test(m)) return "GitHub no acepta esa consulta. No admite expresiones regulares ni par\u00E9ntesis en los operadores. (" + m + ")";
-  return m;
-}
-
-async function bpGsFetchMore(run) {
-  for (const ch of bpGs.chunks) {
-    if (run !== bpGs.run) return;
-    if (ch.done) continue;
-    const url = `/search/code?q=${encodeURIComponent(ch.q)}&per_page=${BP_GS_PER_PAGE}&page=${ch.page + 1}`;
-    let data;
-    try {
-      data = await bpGhApi(url, { headers: { Accept: "application/vnd.github.text-match+json" } });
-    } catch (e) {
-      if (!/no se pudo conectar/i.test(e.message)) throw e;
-      // El navegador no ha recibido respuesta: se reintenta una vez sin la cabecera de fragmentos
-      // (se ver\u00E1n solo las rutas, pero la b\u00FAsqueda funciona)
-      if (run !== bpGs.run) return;
-      data = await bpGhApi(url);
-      bpGs.noFragments = true;
-    }
-    if (run !== bpGs.run) return;
-    ch.page++;
-    if (ch.page === 1) ch.total = data.total_count || 0;
-    if (data.incomplete_results) bpGs.incomplete = true;
-    const items = data.items || [];
-    for (const it of items) bpGs.items.push(it);
-    bpGs.total = bpGs.chunks.reduce((n, c) => n + c.total, 0);
-    if (items.length < BP_GS_PER_PAGE || ch.page * BP_GS_PER_PAGE >= 1000) ch.done = true;
-  }
-}
-
-async function bpGsSearch() {
-  const q = bpGsInput.value.trim();
-  if (!q) return;
-  if (!bpGhToken || !(bpGhRepoList || []).length) { bpGs.q = ""; bpGs.error = ""; bpGsRender(); return; }
-  const chunks = bpGsBuildChunks(q);
-  const run = ++bpGs.run;
-  Object.assign(bpGs, { q, chunks, items: [], total: 0, incomplete: false, noFragments: false, busy: true, active: -1, error: "", filter: !BP_GS_OWN_SCOPE.test(q) });
-  if (chunks.some(c => c.q.length > BP_GS_MAX_QUERY)) {
-    bpGs.busy = false; bpGs.error = "La consulta es demasiado larga (GitHub admite 256 caracteres contando los repositorios)."; bpGsRender(); return;
-  }
-  bpGsRender();
-  for (let attempt = 0; ; attempt++) {
-    try { await bpGsFetchMore(run); break; }
-    catch (e) {
-      if (run !== bpGs.run) return;
-      console.error("BubiPad b\u00FAsqueda global:", bpGs.chunks.map(c => c.q), e);
-      bpGs.error = bpGsErrText(e);
-      if (/no se pudo conectar/i.test(e.message) && !BP_GS_OWN_SCOPE.test(q)) {
-        const diag = await bpGsDiagnose(q);
-        if (run !== bpGs.run) return;
-        if (diag.mode && diag.mode !== bpGsMode && attempt === 0) {   // otra forma de consulta s\u00ED responde: se usa
-          bpGsMode = diag.mode;
-          Object.assign(bpGs, { chunks: bpGsBuildChunks(q), items: [], total: 0, incomplete: false, noFragments: false, error: "" });
-          bpGsRender();
-          continue;
-        }
-        bpGs.error += " " + diag.text;
-      }
-      break;
-    }
-  }
-  if (run !== bpGs.run) return;
-  bpGs.busy = false;
-  bpGs.active = bpGsVisible().length ? 0 : -1;
-  bpGsRender();
-}
-
-async function bpGsMore() {
-  if (bpGs.busy) return;
-  const run = bpGs.run;
-  bpGs.busy = true; bpGs.error = ""; bpGsRender();
-  try { await bpGsFetchMore(run); } catch (e) { if (run === bpGs.run) bpGs.error = bpGsErrText(e); }
-  if (run !== bpGs.run) return;
-  bpGs.busy = false;
-  if (bpGs.active < 0 && bpGsVisible().length) bpGs.active = 0;
-  bpGsRender();
-}
-
-function bpGsClip(s, re) {
-  if (s.length <= 160) return s;
-  re.lastIndex = 0;
-  const m = re.exec(s), at = m ? m.index : 0, a = Math.max(0, at - 60);
-  return (a > 0 ? "\u2026" : "") + s.slice(a, a + 160) + (a + 160 < s.length ? "\u2026" : "");
-}
-
-function bpGsSnippets(it) {
-  const out = [];
-  const tms = (it.text_matches || []).filter(m => m.property === "content");
-  for (const m of tms.slice(0, 2)) {
-    const terms = Array.from(new Set((m.matches || []).map(x => x.text).filter(Boolean)));
-    if (!terms.length) continue;
-    const re = new RegExp(terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "gi");
-    let n = 0;
-    for (const ln of String(m.fragment || "").split("\n")) {
-      re.lastIndex = 0;
-      if (!re.test(ln)) continue;
-      out.push({ text: bpGsClip(ln.trim(), re), re });
-      if (++n >= 2) break;
-    }
-  }
-  return out.slice(0, 3);
-}
-
-function bpGsHighlight(el, text, re) {
-  re.lastIndex = 0;
-  let last = 0, m;
-  while ((m = re.exec(text))) {
-    if (m[0] === "") { re.lastIndex++; continue; }
-    if (m.index > last) el.appendChild(document.createTextNode(text.slice(last, m.index)));
-    const mk = document.createElement("mark"); mk.textContent = m[0]; el.appendChild(mk);
-    last = m.index + m[0].length;
-  }
-  if (last < text.length) el.appendChild(document.createTextNode(text.slice(last)));
-}
-
-function bpGsRender() {
-  const vis = bpGsVisible(), scroll = bpGsResults.scrollTop;
-  bpGsResults.innerHTML = "";
-  let st;
-  if (bpGs.busy) st = "Buscando\u2026";
-  else if (bpGs.error) st = "\u26A0 " + bpGs.error;
-  else if (!bpGs.q) st = bpGsHint();
-  else if (!vis.length) st = "Sin resultados para \u00AB" + bpGs.q + "\u00BB. " + bpGsHint();
-  else {
-    st = vis.length + (vis.length === 1 ? " archivo" : " archivos");
-    if (bpGs.total > vis.length) st += " de ~" + bpGs.total;
-    if (bpGs.incomplete) st += " \u00B7 resultado incompleto (tiempo l\u00EDmite de GitHub)";
-    if (bpGsMode !== "multi") st += bpGsMode === "single" ? " \u00B7 una consulta por repositorio" : " \u00B7 consulta por propietario";
-    if (bpGs.noFragments) st += " \u00B7 sin fragmentos (el navegador no ha admitido pedirlos)";
-  }
-  bpGsStatus.textContent = st;
-  vis.forEach((it, i) => {
-    const row = document.createElement("div");
-    row.className = "gs-item" + (i === bpGs.active ? " active" : "");
-    row.dataset.i = String(i);
-    const head = document.createElement("div"); head.className = "gs-path";
-    const repo = document.createElement("span"); repo.className = "gs-repo"; repo.textContent = it.repository ? it.repository.name : "";
-    head.append(repo, document.createTextNode(it.path));
-    row.appendChild(head);
-    for (const sn of bpGsSnippets(it)) {
-      const d = document.createElement("div"); d.className = "gs-frag";
-      bpGsHighlight(d, sn.text, sn.re);
-      row.appendChild(d);
-    }
-    bpGsResults.appendChild(row);
-  });
-  if (!bpGs.busy && bpGs.chunks.some(c => !c.done) && vis.length) {
-    const more = document.createElement("button");
-    more.className = "gs-more"; more.textContent = "M\u00E1s resultados";
-    bpGsResults.appendChild(more);
-  }
-  bpGsResults.scrollTop = scroll;
-}
-
-function bpGsMoveActive(delta) {
-  const rows = bpGsResults.querySelectorAll(".gs-item");
-  if (!rows.length) return;
-  rows[bpGs.active]?.classList.remove("active");
-  bpGs.active = (bpGs.active + delta + rows.length) % rows.length;
-  rows[bpGs.active].classList.add("active");
-  rows[bpGs.active].scrollIntoView({ block: "nearest" });
-}
-
-function bpGsJump(it) {
-  let term = "";
-  const tm = (it.text_matches || []).find(m => m.property === "content" && (m.matches || []).length);
-  if (tm) term = tm.matches[0].text;
-  if (!term) term = bpGs.q.replace(/(^|\s)-?\w+:\S+/g, " ").replace(/"/g, "").split(/\s+/).filter(w => w && !/^(AND|OR|NOT)$/.test(w))[0] || "";
-  if (!term) return;
-  setTimeout(() => {
-    try {
-      if (lp !== "edit" || !Nt.getModel()) return;
-      const ms = Nt.getModel().findMatches(term, false, false, false, null, false, 1);
-      if (ms.length) { Nt.setSelection(ms[0].range); Nt.revealRangeInCenter(ms[0].range); }
-      Nt.focus();
-    } catch (e) {}
-  }, 150);
-}
-
-async function bpGsOpen(it) {
-  bpGsPopup.style.display = "none";
-  try {
-    const full = String(it.repository.full_name || "").toLowerCase();
-    const rr = (bpGhRepoList || []).find(r => `${r.owner}/${r.repo}`.toLowerCase() === full);
-    const owner = rr ? rr.owner : it.repository.owner.login, repo = rr ? rr.repo : it.repository.name;
-    let branch = rr && rr.branch;
-    if (!branch) branch = (await bpGhApi(`/repos/${owner}/${repo}`)).default_branch;
-    const name = it.name || it.path.split("/").pop();
-    await bpGhOpenFile({ kind: "file", name, handle: { __gh: true, owner, repo, branch, path: it.path, sha: null } });
-    bpGsJump(it);
-  } catch (e) { xo("\u26A0 " + e.message); }
-}
-
-function bpToggleGlobalSearch() {
-  if (bpGsPopup.style.display === "block") { bpGsPopup.style.display = "none"; bpRefocusEditor(); return; }
-  let pre = "";
-  try {
-    if (sp() && lp === "edit") {
-      const sel = Nt.getSelection();
-      const t = sel && !sel.isEmpty() ? Nt.getModel().getValueInRange(sel) : "";
-      if (t && t.length <= 100 && !/\n/.test(t)) pre = t.trim();
-    }
-  } catch (e) {}
-  if (pre) bpGsInput.value = pre;
-  bpGsPopup.style.display = "block";
-  bpGsRender();
-  bpGsInput.focus();
-  bpGsInput.select();
-}
-
-bpGsInput?.addEventListener("keydown", ev => {
-  if (ev.key === "ArrowDown" || ev.key === "ArrowUp") { ev.preventDefault(); bpGsMoveActive(ev.key === "ArrowDown" ? 1 : -1); }
-  else if (ev.key === "Enter") {
-    ev.preventDefault();
-    const vis = bpGsVisible();
-    if (!bpGs.busy && bpGs.q === bpGsInput.value.trim() && bpGs.active >= 0 && vis[bpGs.active]) bpGsOpen(vis[bpGs.active]);
-    else bpGsSearch();
-  }
-});
-bpGsResults?.addEventListener("click", ev => {
-  if (ev.target.closest(".gs-more")) { bpGsMore(); return; }
-  const row = ev.target.closest(".gs-item");
-  if (!row) return;
-  const it = bpGsVisible()[+row.dataset.i];
-  if (it) bpGsOpen(it);
-});
-document.addEventListener("click", ev => {
-  if (bpGsPopup && bpGsPopup.style.display === "block" && !bpGsPopup.contains(ev.target)) bpGsPopup.style.display = "none";
-});
 
 /* --- Tecla l\u00EDder: \u00ABy\u00BB exporta; \u00ABn\u00BB (nueva nota) ya no existe en la web --- */
 bpLeaderActions.y = () => bpExport();
