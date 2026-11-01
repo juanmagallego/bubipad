@@ -3256,6 +3256,7 @@ function bpGsVisible() {
 function bpGsErrText(e) {
   const m = (e && e.message) || String(e);
   if (/rate limit/i.test(m)) return m + " Espera un minuto (GitHub permite 10 b\u00FAsquedas de c\u00F3digo por minuto).";
+  if (/no se pudo conectar/i.test(m)) return m + " Si has hecho varias b\u00FAsquedas seguidas, espera un minuto (l\u00EDmite de 10 por minuto); si no, revisa la conexi\u00F3n o si alg\u00FAn bloqueador de contenido bloquea api.github.com.";
   if (/validation failed/i.test(m)) return "GitHub no acepta esa consulta. No admite expresiones regulares ni par\u00E9ntesis en los operadores. (" + m + ")";
   return m;
 }
@@ -3264,8 +3265,18 @@ async function bpGsFetchMore(run) {
   for (const ch of bpGs.chunks) {
     if (run !== bpGs.run) return;
     if (ch.done) continue;
-    const data = await bpGhApi(`/search/code?q=${encodeURIComponent(ch.q)}&per_page=${BP_GS_PER_PAGE}&page=${ch.page + 1}`,
-      { headers: { Accept: "application/vnd.github.text-match+json" } });
+    const url = `/search/code?q=${encodeURIComponent(ch.q)}&per_page=${BP_GS_PER_PAGE}&page=${ch.page + 1}`;
+    let data;
+    try {
+      data = await bpGhApi(url, { headers: { Accept: "application/vnd.github.text-match+json" } });
+    } catch (e) {
+      if (!/no se pudo conectar/i.test(e.message)) throw e;
+      // El navegador no ha recibido respuesta: se reintenta una vez sin la cabecera de fragmentos
+      // (se ver\u00E1n solo las rutas, pero la b\u00FAsqueda funciona)
+      if (run !== bpGs.run) return;
+      data = await bpGhApi(url);
+      bpGs.noFragments = true;
+    }
     if (run !== bpGs.run) return;
     ch.page++;
     if (ch.page === 1) ch.total = data.total_count || 0;
@@ -3283,7 +3294,7 @@ async function bpGsSearch() {
   if (!bpGhToken || !(bpGhRepoList || []).length) { bpGs.q = ""; bpGs.error = ""; bpGsRender(); return; }
   const chunks = bpGsBuildChunks(q);
   const run = ++bpGs.run;
-  Object.assign(bpGs, { q, chunks, items: [], total: 0, incomplete: false, busy: true, active: -1, error: "", filter: !BP_GS_OWN_SCOPE.test(q) });
+  Object.assign(bpGs, { q, chunks, items: [], total: 0, incomplete: false, noFragments: false, busy: true, active: -1, error: "", filter: !BP_GS_OWN_SCOPE.test(q) });
   if (chunks.some(c => c.q.length > BP_GS_MAX_QUERY)) {
     bpGs.busy = false; bpGs.error = "La consulta es demasiado larga (GitHub admite 256 caracteres contando los repositorios)."; bpGsRender(); return;
   }
@@ -3355,6 +3366,7 @@ function bpGsRender() {
     st = vis.length + (vis.length === 1 ? " archivo" : " archivos");
     if (bpGs.total > vis.length) st += " de ~" + bpGs.total;
     if (bpGs.incomplete) st += " \u00B7 resultado incompleto (tiempo l\u00EDmite de GitHub)";
+    if (bpGs.noFragments) st += " \u00B7 sin fragmentos (el navegador no ha admitido pedirlos)";
   }
   bpGsStatus.textContent = st;
   vis.forEach((it, i) => {
