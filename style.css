@@ -1410,3 +1410,108 @@ button.menu-title.open {
     box-sizing: border-box;
   }
 }
+
+/* --- Búsqueda global en repositorios --- */
+#global-search-popup {
+  display: none;
+  position: fixed;
+  z-index: 210;
+  top: 52px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(680px, calc(100vw - 16px));
+  background: var(--toolbar-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  padding: 10px;
+}
+
+#global-search-status {
+  font-size: 12px;
+  color: var(--text-fg);
+  opacity: 0.8;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+}
+
+#global-search-results {
+  max-height: calc(100vh - 170px);
+  overflow-y: auto;
+}
+
+.gs-item {
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.gs-item:hover,
+.gs-item.active {
+  background: var(--btn-bg-hover);
+}
+
+.gs-path {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-fg);
+  overflow-wrap: anywhere;
+}
+
+.gs-repo {
+  font-weight: 400;
+  opacity: 0.65;
+  margin-right: 8px;
+}
+
+.gs-frag {
+  font-size: 12px;
+  color: var(--text-fg);
+  opacity: 0.85;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gs-frag mark {
+  background: rgba(255, 200, 0, 0.4);
+  color: inherit;
+  border-radius: 2px;
+}
+
+.gs-more {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px;
+  border: 1px solid var(--btn-border);
+  border-radius: 4px;
+  background: var(--btn-bg);
+  color: var(--text-fg);
+  cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  #global-search-popup {
+    top: 44px;
+    padding: 12px;
+  }
+
+  #global-search-input {
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .gs-item {
+    padding: 10px;
+  }
+
+  .gs-path {
+    font-size: 15px;
+  }
+
+  .gs-frag {
+    font-size: 14px;
+  }
+}
