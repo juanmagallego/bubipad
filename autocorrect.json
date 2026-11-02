@@ -1,0 +1,18 @@
+{
+  "Guion largo": {
+    "prefix": "--",
+    "body": "—",
+    "expand": "next",
+    "description": "-- → raya (U+2014). Espera a la tecla siguiente para que --- siga valiendo para líneas horizontales y tablas"
+  },
+  "Comilla de apertura": {
+    "prefix": "\"ii",
+    "body": "“",
+    "description": "\"ii → comilla de apertura (U+201C)"
+  },
+  "Comilla de cierre": {
+    "prefix": "\"dd",
+    "body": "”",
+    "description": "\"dd → comilla de cierre (U+201D)"
+  }
+}

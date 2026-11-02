@@ -41,6 +41,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+Shift+8` (o `Ctrl+R` `n`) — Poner o quitar viñetas/lista en todas las líneas seleccionadas: si todas ya son viñeta (`- `, `* `, `+ `, `- [ ] `) o lista numerada (`1. `), se quitan; si no, se añade `- ` a las que no la tienen (sin tocar las líneas vacías). Está también en Editar
 - `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Ctrl+L` — Seleccionar línea
 - `Ctrl+↑` / `Ctrl+↓` — Inicio / final del archivo (en macOS, `Cmd+↑/↓`)
+- `Ctrl+Shift+←` / `Ctrl+Shift+→` — Seleccionar palabra a palabra (no cambia de pestaña ni salta de párrafo; en macOS también con `Ctrl`, no con `Cmd`)
 - `Alt+↑` / `Alt+↓` o `Ctrl+Shift+↑` / `Ctrl+Shift+↓` — Mover línea · `Alt+Shift+↑` / `Alt+Shift+↓` — Duplicar línea
 - `Alt+X` — Unicode ↔ carácter
 - `Ctrl+F` / `Ctrl+H` — Buscar / reemplazar · `F3` / `Shift+F3` — Siguiente / anterior
@@ -87,7 +88,8 @@ En el panel de GitHub (icono del gato, `Alt+R`) basta con pegar el token y pulsa
 - **Campo de repositorios vacío:** se abren todos los repositorios a los que da acceso el token (hasta 6, por orden alfabético, ignorando los archivados y prefiriendo aquellos en los que se puede escribir). Un token limitado a un solo repositorio (por ejemplo, solo KZ) abre solo ese, exactamente como antes. Un token con acceso a varios abre todos sin tener que elegir.
 - **Lista explícita:** `usuario/Notas, usuario/KZ`. Se abren en el orden escrito; si alguno falla se avisa y se abren los demás.
 - Con un solo repositorio el explorador es el de siempre (`GH: usuario/repo`). Con varios, cada repositorio es una carpeta de la raíz `GH: …`; su contenido se descarga la primera vez que se despliega (o al buscar archivos con `Ctrl+O`, que lista los archivos de todos los repositorios, una línea por archivo). El repositorio del archivo abierto aparece en la barra de estado, a la izquierda del chip ■/□.
-- **Orden de carga:** el repositorio **Notas** (el principal) se carga y se muestra siempre el primero, también cuando el token da acceso a más de seis (Notas nunca queda fuera del recorte).
+- **Qué se abre solo:** con el campo vacío solo se abren repositorios **privados**, y nunca `bubipad`. Un repositorio público (o `bubipad`) solo se abre si lo escribes en el campo (`usuario/repositorio`) o si sigues un enlace a él desde una nota.
+- **Orden de carga:** el repositorio **Notas** (el principal) se carga y se muestra siempre el primero, también cuando el token da acceso a más de seis (Notas nunca queda fuera del recorte). Se descarga nada más conectar, antes que cualquier otro, y la búsqueda de archivos (`Ctrl+O`) y «home» también recorren Notas primero.
 - **Home:** se busca primero un archivo llamado exactamente `Home.md` (en cualquier repositorio, empezando por Notas); si no hay, el primero cuyo nombre empiece por «home» (`Home_ALEA.md`); si tampoco, cualquiera que contenga «home» en el nombre (`ALEA_Home.md`). A igualdad de criterio gana el más cercano a la raíz y, después, el repositorio Notas / el último usado. `Alt+H` sigue el mismo criterio.
 - Los enlaces `[[nota]]` y los enlaces relativos se resuelven dentro del repositorio del archivo abierto. No se puede crear archivos ni eliminar en la raíz `GH:`, ni eliminar un repositorio entero.
 - El token se guarda en el navegador. En un token «fine-grained», concede acceso solo a los repositorios que quieras ver.
@@ -146,4 +148,26 @@ oculta automáticamente porque el navegador no soporta esa API.
 
 ## Menús y botones
 
-La barra superior tiene los menús **Archivo, Editar, Ver, Ir, GIT, EU/ES y Ayuda**; todas las funciones están en ellos. Debajo quedan solo los botones más habituales: abrir GitHub, guardar, buscar archivo (icono de carpeta), mover línea (↑/↓), esquema del documento (icono de jerarquía), buscar, vista previa/edición, EU, ES y, al final, borrar línea. «Cerrar todas las pestañas» está en Editar. Los archivos se abren en Mónaco; la vista previa y el texto plano se eligen desde Ver. Al abrir no se busca ningún archivo «home»: sin archivos abiertos se muestra el logotipo y cuatro enlaces (Archivo = buscar, Home = siempre en vista previa, GitHub y Salir). Desde la vista previa, los enlaces a otras notas las abren también en vista previa hasta que pases a edición (doble clic, menú Ver o chip ■/□). El menú Editar incluye Copiar, Cortar y Pegar; las operaciones con líneas están en Ir, tras «Ir a la línea». El corrector arranca desactivado; los botones ES y EU fijan cada idioma y el ciclo ES → EU → ninguno está en el menú EU/ES (y en `Alt+L`). Monaco no resalta corchetes, paréntesis ni otros elementos de código.
+La barra superior tiene los menús **Archivo, Editar, Ver, Ir, GIT, EU/ES y Ayuda**; todas las funciones están en ellos. Debajo quedan solo los botones más habituales: abrir GitHub, guardar, buscar archivo (icono de carpeta), mover línea (↑/↓), esquema del documento (icono de jerarquía), buscar, vista previa/edición, EU, ES y, al final, borrar línea. «Cerrar todas las pestañas» está en Archivo. El menú Ir ya no tiene «Atrás / Adelante en el historial» (los atajos siguen funcionando). Los archivos se abren en Mónaco; la vista previa y el texto plano se eligen desde Ver. Al abrir no se busca ningún archivo «home»: sin archivos abiertos se muestra el logotipo y cuatro enlaces (Archivo = buscar, Home = siempre en vista previa, GitHub y Salir). Desde la vista previa, los enlaces a otras notas las abren también en vista previa hasta que pases a edición (doble clic, menú Ver o chip ■/□). El menú Editar incluye Copiar, Cortar y Pegar; las operaciones con líneas están en Ir, tras «Ir a la línea». El corrector arranca desactivado; los botones ES y EU fijan cada idioma y el ciclo ES → EU → ninguno está en el menú EU/ES (y en `Alt+L`). Monaco no resalta corchetes, paréntesis ni otros elementos de código, y tampoco cierra solo corchetes, paréntesis, comillas ni otros pares.
+
+
+## Autocorrección
+
+BubiPad sustituye ciertos textos mientras escribes. Las sustituciones están en **`autocorrect.json`**, junto a `index.html`, con el formato de los snippets de VS Code. Para añadir o cambiar una, edita ese archivo en el repositorio de la app y súbelo (la app lo lee al arrancar; recarga la página tras cambiarlo).
+
+```json
+{
+  "Guion largo": { "prefix": "--", "body": "—", "expand": "next" },
+  "Comilla de apertura": { "prefix": "\"ii", "body": "“" },
+  "Comilla de cierre": { "prefix": "\"dd", "body": "”" }
+}
+```
+
+- `prefix` — lo que se escribe (una cadena, o una lista de cadenas para varios disparadores). No puede contener saltos de línea.
+- `body` — lo que lo sustituye (una cadena, o una lista de líneas). `$0` marca dónde queda el cursor.
+- `expand` (opcional) — `"type"` (por defecto): sustituye en cuanto se escribe el último carácter del `prefix`. `"next"`: espera a la tecla siguiente y solo sustituye si el `prefix` no forma parte de una serie más larga; por eso `--` da `—` pero `---` (línea horizontal, tablas, cabecera YAML) no se toca.
+- `description` y cualquier otro campo se ignoran: sirven para anotar.
+- Si hay varios `prefix` que encajan, gana el más largo.
+- No se aplica dentro de bloques de código (` ``` `) ni de código en línea (`` ` ``).
+- Cada sustitución es un paso de deshacer independiente: `Ctrl+Z` devuelve el texto tal como lo escribiste.
+- Funciona en Mónaco y en texto plano. Si `autocorrect.json` no se puede leer o está mal formado, se usan las tres sustituciones de arriba.

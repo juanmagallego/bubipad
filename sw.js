@@ -1,4 +1,4 @@
-const CACHE_NAME = "bubipad-shell-v24";
+const CACHE_NAME = "bubipad-shell-v25";
 
 // Recursos grandes y estables: se sirven desde caché (rápido) y se
 // actualizan en segundo plano. Todo lo demás (el código de la app) se
@@ -20,6 +20,7 @@ const APP_SHELL = [
   "./storage-shim.js",
   "./sw-register.js",
   "./manifest.webmanifest",
+  "./autocorrect.json",
   "./vendor/monaco-bundle.js",
   "./vendor/monaco-bundle.css",
   "./vendor/editor.worker.js",
