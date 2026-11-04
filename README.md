@@ -42,11 +42,11 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Ctrl+L` — Seleccionar línea
 - `Ctrl+↑` / `Ctrl+↓` — Inicio / final del archivo (en macOS, `Cmd+↑/↓`)
 - `Ctrl+Shift+←` / `Ctrl+Shift+→` — Seleccionar palabra a palabra (no cambia de pestaña ni salta de párrafo; en macOS también con `Ctrl`, no con `Cmd`)
-- `Alt+↑` / `Alt+↓` o `Ctrl+Shift+↑` / `Ctrl+Shift+↓` — Mover línea · `Alt+Shift+↑` / `Alt+Shift+↓` — Duplicar línea
+- `Alt+↑` / `Alt+↓` o `Ctrl+Shift+↑` / `Ctrl+Shift+↓` — Mover línea · `Alt+Shift+↑` / `Alt+Shift+↓` — Duplicar línea (en Mónaco y en texto plano; no añade cursor). Varios cursores: `Alt`+clic
 - `Alt+X` — Unicode ↔ carácter
 - `Ctrl+F` / `Ctrl+H` — Buscar / reemplazar · `F3` / `Shift+F3` — Siguiente / anterior
 - `F1` o `Ctrl+Shift+P` — Paleta de comandos de Monaco
-- `Enter` en una lista (`- `, `* `, `1. `, `- [ ] `) — Continúa la lista; si el elemento está vacío, la termina
+- `Enter` en una lista (`- `, `* `, `1. `, `- [ ] `) — Continúa la lista; si el elemento está vacío, la termina. Con el cursor antes de la viñeta (o dentro de ella) solo abre una línea vacía encima y la viñeta se queda en su línea
 
 ### Corrector ortográfico
 

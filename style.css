@@ -1410,3 +1410,13 @@ button.menu-title.open {
     box-sizing: border-box;
   }
 }
+
+/* Sin resaltado de corchetes ni parentesis (no se usa para programar) */
+.monaco-editor .bracket-match,
+.monaco-editor .bracket-match-inline,
+.monaco-editor .cdr.bracket-match {
+  background: transparent !important;
+  border: 0 !important;
+  color: inherit !important;
+}
+.monaco-editor [class*="bracket-highlighting-"] { color: inherit !important; }
