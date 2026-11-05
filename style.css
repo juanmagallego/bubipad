@@ -661,10 +661,15 @@ html[data-theme="light"] #welcome-rule {
 /* Hunspell squiggly underline + language popup */
 /* ---------------------------------------------------------------------- */
 
-.hunspell-error {
-  text-decoration: underline wavy #ff5555;
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1.5px;
+/* Palabra mal escrita: se cambia el color del propio texto (sin subrayado ni capas):
+   naranja en oscuro, azul en claro. Va con !important porque Monaco pone el color de cada
+   palabra con su clase .mtkN en la misma etiqueta. */
+.monaco-editor .hunspell-error {
+  color: #ff9f1a !important;
+  text-decoration: none !important;
+}
+html[data-theme="light"] .monaco-editor .hunspell-error {
+  color: #1a6fe0 !important;
 }
 
 #file-search-popup {

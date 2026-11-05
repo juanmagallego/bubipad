@@ -16,6 +16,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Ctrl+W` / `Ctrl+Shift+X` — Cerrar la pestaña actual
 - `Ctrl+T` / `Ctrl+Shift+M` — Esquema del documento (en vista previa salta al título sin cambiar de modo)
 - `Alt+R` — Panel de GitHub
+- `Alt+M` o `F10` — Abre el menú (Archivo) o lo cierra si ya está abierto (`Alt+M` no funciona en macOS, como el resto de atajos `Alt`). Alternativa a `Esc` en Android, donde `Esc` hace de «Atrás» y cierra la app. También `Ctrl+R` y luego `Espacio` (o `Intro`).
 - `Esc` — Cierra la ventana o el menú abiertos; si no hay ninguno, abre el primer menú (Archivo). Con un menú abierto: `←`/`→` cambian de menú, `↑`/`↓` (o `Inicio`/`Fin`) se mueven por las opciones, una letra salta a la opción que empieza por ella, `Intro` la ejecuta y `Esc` sale devolviendo el foco al editor. En el editor, `Esc` sigue siendo de Mónaco mientras haya abierto el buscador, las sugerencias o la paleta de comandos
 - Esquema (`Ctrl+T`): el foco queda en el primer título; `↑`/`↓`, `Inicio`/`Fin` para moverse e `Intro` para saltar
 - `F4` — Abrir el enlace bajo el cursor
@@ -36,7 +37,8 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 ### Edición
 
 - `Ctrl+B` / `Ctrl+I` (o `Alt+I`) — Negrita / cursiva · `Ctrl+K` — Insertar enlace (usa el portapapeles como URL)
-- `Alt+E` o `:` — Selector de emojis
+- `:` — Selector de emojis (ya no tiene atajo `Alt+E`)
+- `Alt+E` / `Alt+C` — Corrector en euskera / en español (también `Ctrl+R e` / `Ctrl+R c`)
 - `Ctrl+U` — minúsculas → MAYÚSCULAS → Título → minúsculas (sobre la selección o la palabra bajo el cursor)
 - `Ctrl+Shift+8` (o `Ctrl+R` `n`) — Poner o quitar viñetas/lista en todas las líneas seleccionadas: si todas ya son viñeta (`- `, `* `, `+ `, `- [ ] `) o lista numerada (`1. `), se quitan; si no, se añade `- ` a las que no la tienen (sin tocar las líneas vacías). Está también en Editar
 - `Ctrl+J` — Unir líneas · `Ctrl+D` / `Ctrl+Shift+K` — Eliminar línea · `Ctrl+L` — Seleccionar línea
@@ -66,7 +68,7 @@ Al pulsarla aparece un aviso en la barra de estado esperando la siguiente tecla 
 - `e` corrector en euskera · `c` corrector en español (fijan el idioma; para quitarlo, `Alt+L` o `z`)
 - `d` eliminar línea · `j` unir líneas · `w` minúsculas/MAYÚSCULAS/Título (la paleta de comandos sigue en `F1` / `Ctrl+Shift+P`)
 - `l` tema · `i` idioma del corrector · `z` corrector sí/no · `+` / `-` zoom
-- `←` / `→` historial · `↑` / `↓` mover línea · `Tab` / `Shift+Tab` pestaña siguiente / anterior · `?` ayuda
+- `Espacio` o `Intro` abren el menú (Archivo) · `←` / `→` historial · `↑` / `↓` mover línea · `Tab` / `Shift+Tab` pestaña siguiente / anterior · `?` ayuda
 
 ### Cambios respecto a versiones anteriores
 
