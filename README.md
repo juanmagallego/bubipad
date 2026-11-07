@@ -9,6 +9,7 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - Nueva nota: ya no se crea desde la web (solo desde la versión de terminal)
 - `Ctrl+R` `y` — Exportar copia: guarda una copia en otro sitio **sin cambiar el destino** del archivo (un archivo de GitHub sigue guardándose en GitHub). Sin File System Access API (Safari/iPad) se descarga el archivo
 - `Ctrl+S` — Guardar · `Ctrl+Shift+S` — Guardar como
+- Clic en la pestaña activa cuando tiene cambios sin guardar (punto rojo) — Guardar (igual que `Ctrl+S`; en una pestaña inactiva el clic solo cambia de pestaña)
 - `Ctrl+O` — Buscar y abrir archivo por nombre
 - `Alt+O` / `Ctrl+Shift+O` — Abrir archivo del ordenador
 - `Ctrl+P` / `F9` / `Ctrl+Shift+F` — Mostrar u ocultar el explorador
@@ -86,6 +87,9 @@ Algunas combinaciones (`Ctrl+N`, `Ctrl+O`, `Ctrl+P`, `Ctrl+W`, `Ctrl+T`, `Ctrl+T
 ## GitHub: uno o varios repositorios con el mismo token
 
 En el panel de GitHub (icono del gato, `Alt+R`) basta con pegar el token y pulsar «Conectar»:
+
+- Una vez guardado el token, el botón **GITHUB** de la pantalla de inicio hace directamente «Conectar y abrir» con las credenciales guardadas (si no hay token, o si falla la conexión, abre este panel). Para cambiar de token o de repositorios, usa el icono del gato de la barra o `Alt+R`.
+- Al abrir repositorios, la barra lateral del explorador **no** se muestra sola: `Ctrl+P` / `F9` la alterna, y pasar el ratón por el borde izquierdo la muestra temporalmente.
 
 - **Campo de repositorios vacío:** se abren todos los repositorios a los que da acceso el token (hasta 6, por orden alfabético, ignorando los archivados y prefiriendo aquellos en los que se puede escribir). Un token limitado a un solo repositorio (por ejemplo, solo KZ) abre solo ese, exactamente como antes. Un token con acceso a varios abre todos sin tener que elegir.
 - **Lista explícita:** `usuario/Notas, usuario/KZ`. Se abren en el orden escrito; si alguno falla se avisa y se abren los demás.
