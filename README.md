@@ -8,8 +8,10 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 
 - Nueva nota: ya no se crea desde la web (solo desde la versión de terminal)
 - `Ctrl+R` `y` — Exportar copia: guarda una copia en otro sitio **sin cambiar el destino** del archivo (un archivo de GitHub sigue guardándose en GitHub). Sin File System Access API (Safari/iPad) se descarga el archivo
+- `Ctrl+R` `9` — Exportar a PDF (Archivo > Exportar a PDF…): abre el diálogo de impresión del navegador; elige «Guardar como PDF» y la carpeta. El PDF sale de la vista previa (texto real, seleccionable) y usa el nombre de la nota
 - `Ctrl+S` — Guardar · `Ctrl+Shift+S` — Guardar como
 - Clic en la pestaña activa cuando tiene cambios sin guardar (punto rojo) — Guardar (igual que `Ctrl+S`; en una pestaña inactiva el clic solo cambia de pestaña)
+  - Mientras guarda, la pestaña cambia de color (según el tema) y el punto se pone ámbar y parpadea; al terminar vuelve a lo normal con el punto verde. Se ve durante un mínimo de ~0,7 s aunque el guardado local sea instantáneo. Lo mismo ocurre con `Ctrl+S` y «Guardar como»
 - `Ctrl+O` — Buscar y abrir archivo por nombre
 - `Alt+O` / `Ctrl+Shift+O` — Abrir archivo del ordenador
 - `Ctrl+P` / `F9` / `Ctrl+Shift+F` — Mostrar u ocultar el explorador
@@ -21,6 +23,10 @@ En macOS no se capturan las combinaciones `Alt`+letra (con Opción el teclado es
 - `Esc` — Cierra la ventana o el menú abiertos; si no hay ninguno, abre el primer menú (Archivo). Con un menú abierto: `←`/`→` cambian de menú, `↑`/`↓` (o `Inicio`/`Fin`) se mueven por las opciones, una letra salta a la opción que empieza por ella, `Intro` la ejecuta y `Esc` sale devolviendo el foco al editor. En el editor, `Esc` sigue siendo de Mónaco mientras haya abierto el buscador, las sugerencias o la paleta de comandos
 - Esquema (`Ctrl+T`): el foco queda en el primer título; `↑`/`↓`, `Inicio`/`Fin` para moverse e `Intro` para saltar
 - `F4` — Abrir el enlace bajo el cursor
+
+### Cursor entre editores
+
+Al cambiar entre Mónaco, texto plano y vista previa (y entre pestañas), el cursor y la selección se mantienen en la misma línea y columna, también en archivos con final de línea de Windows (CRLF). Al pasar a la vista previa se muestra el bloque donde estaba el cursor; al volver desde ella, el cursor va al texto seleccionado o, si has desplazado la vista, al primer bloque visible.
 
 ### Pestañas e historial
 
